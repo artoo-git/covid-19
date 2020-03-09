@@ -28,7 +28,7 @@ i<-1
 long$count<-1
 # calculate  the difference in scores to model the daily increase and not the total count
 while (i <= length(long$day)){
-  if(i!=1){
+  if(long$total[i] > 0){
     long$count[i]<-long$total[i]-long$total[i-1]
   }else{
     long$count[i]<-long$total[i]
