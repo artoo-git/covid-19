@@ -18,34 +18,12 @@ library(reshape2)
 long <- melt(subset, id.vars = c("Country.Region"))
 colnames(long)<- c("country","date","total")
 
-###CAREFUL IN THIS DATASET SOME DATA IS TOTAL AND NOT DAILY
-
-#We must calculate daily increase and model each daily measure instead
-# modelling the total in order to avoid adding up the error
 long$day<-1:length(long$date)
-
-i<-1
-long$count<-1
-# calculate  the difference in scores to model the daily increase and not the total count
-while (i <= length(long$day)){
-  if(long$total[i] > 0){
-    long$count[i]<-long$total[i]-long$total[i-1]
-  }else{
-    long$count[i]<-long$total[i]
-  }
-  i<-i+1
-}
-
 
 plot(long$day,long$count)
 
-#Long %>% ggplot(aes(x = day, y = count))+
-#                  geom_point(size=2, shape=1)
-#
-
-#########################################
-# CURRENTLY (09/03/20) the model fails because the number of measures is too small
-# to estimate the start parameters. Below there is a snippet to "eyeball" the start parameters
+########################################
+# CURRENTLY (09/03/20) the model fails because the number of measures is too small and not upper shift in sight!!
 ######################################### 
 
 #find the parameters for the equation
@@ -67,7 +45,33 @@ cor(long$count,predict(m))
 lines(long$day,predict(m),col="red",lty=2,lwd=3)
 
 
-######################################### estimation with eyeballed parameteres
+########## Alternative estimation for daily increase base on EXP growth
+# eyeballed parameteres for the start
+
+long <- melt(subset, id.vars = c("Country.Region"))
+colnames(long)<- c("country","date","total")
+
+###CAREFUL IN THIS DATASET SOME DATA IS TOTAL AND NOT DAILY
+
+#We must calculate daily increase and model each daily measure instead
+# modelling the total in order to avoid adding up the error
+long$day<-1:length(long$date)
+
+i<-1
+long$count<-1
+# calculate  the difference in scores to model the daily increase and not the total count
+while (i <= length(long$day)){
+  if(long$total[i] > 0){
+    long$count[i]<-long$total[i]-long$total[i-1]
+  }else{
+    long$count[i]<-long$total[i]
+  }
+  i<-i+1
+}
+
+
+plot(long$day,long$count)
+
 
 a_start<-33 #param a is the y value when x=0
 b_start<-2*log(2)/a_start #b is the decay rate
