@@ -26,8 +26,9 @@ subset<-data[which(data$Country.Region == country),]
 
 
 long <- melt(subset, id.vars = c("Country.Region"))
-newrow<-data.frame(Country.Region ="Italy", variable = "X3.10.20", value = 10149)
-long<-rbind(long,newrow)
+### added by hand the provisional datapoint for 10/03
+#newrow<-data.frame(Country.Region ="Italy", variable = "X3.10.20", value = 10149)
+#long<-rbind(long,newrow)
 
 
 ############################################# 
@@ -71,8 +72,9 @@ subset<-data[which(data$Country.Region == country),]
 
 long <- melt(subset, id.vars = c("Country.Region"))
 
-newrow<-data.frame(Country.Region ="Italy", variable = "X3.10.20", value = 10149)
-long<-rbind(long,newrow)
+### added by hand the provisional datapoint for 10/03
+#newrow<-data.frame(Country.Region ="Italy", variable = "X3.10.20", value = 10149)
+#long<-rbind(long,newrow)
 
 
 colnames(long)<- c("country","date","count")
@@ -123,12 +125,4 @@ lines(long$day,predict(m),col="red",lty=3,lwd=2)
 ################################# Extrapolate
 predict(m, newdata =  data.frame(day = 49:89))
 # 
-
-
-
-
-
-
-
-
 
