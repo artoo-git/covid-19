@@ -75,25 +75,25 @@ long$day<-1:nrow(long)
 
 
 ##find the parameters for the equation
-#SS<-getInitial(count~SSlogis(day,alpha,xmid,scale),data=data.frame(count=long$count,day=long$day))
+SS<-getInitial(count~SSlogis(day,alpha,xmid,scale),data=data.frame(count=long$count,day=long$day))
 
-# #we used a different parametrization
-# K_start<-SS["alpha"]
-# R_start<-1/SS["scale"]
-# N0_start<-SS["alpha"]/(exp(SS["xmid"]/SS["scale"])+1)
-# #the formula for the model
-# log_formula<-formula(count~K*N0*exp(R*day)/(K+N0*(exp(R*day)-1)))
-# #fit the model
-# m<-nls(log_formula,start=list(K=K_start,R=R_start,N0=N0_start), data = long)
-# #estimated parameters
-# summary(m)
-# #get some estimation of goodness of fit
-# cor(long$count,predict(m))
+ #we used a different parametrization
+ K_start<-SS["alpha"]
+ R_start<-1/SS["scale"]
+ N0_start<-SS["alpha"]/(exp(SS["xmid"]/SS["scale"])+1)
+ #the formula for the model
+ log_formula<-formula(count~K*N0*exp(R*day)/(K+N0*(exp(R*day)-1)))
+ #fit the model
+ m<-nls(log_formula,start=list(K=K_start,R=R_start,N0=N0_start), data = long)
+ #estimated parameters
+ summary(m)
+ #get some estimation of goodness of fit
+ cor(long$count,predict(m))
 
 
 
-#plot(long$day,long$count, main = paste(country, ":Total count of new cases"))
-#lines(long$day,predict(m),col="red",lty=2,lwd=3)
+plot(long$day,long$count, main = paste(country, ":Total count of new cases"))
+lines(long$day,predict(m),col="red",lty=2,lwd=3)
 
 
 # uncomment this if the self-determining function breaks
