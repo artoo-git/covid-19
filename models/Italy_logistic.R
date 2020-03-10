@@ -43,7 +43,7 @@ long$day<-1:nrow(long)
 
 
 long$count <- 1 #initialize a count variable
-i<-10
+i<-1
 
 # calculate  the difference in scores to model the daily increase and not the total count
 while (i <= nrow(long)){
