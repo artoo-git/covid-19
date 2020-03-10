@@ -12,6 +12,7 @@
 country = "Italy" 
 ####################
 
+par(mfrow=c(2,1))
 
 data<-read.csv(file = "/home/diego/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
 
@@ -48,27 +49,14 @@ while (i <= length(long$day)){
 }
 
 
-plot(long$day,long$count)
-
-# uncomment this if the distribution is just exponential
-#a_start<-33 #param a is the y value when x=0
-#b_start<-2*log(2)/a_start #b is the decay rate
-
-#m<-nls(count~a*exp(b*day),start=list(a=a_start,b=b_start), data = long)
-
-#summary(m)
-
-#get some estimation of goodness of fit
-#cor(long$count,predict(m))
+plot(long$day,long$count, main = paste(country, ":everyday count of new cases"))
 
 
-#plot(long$day,long$count)
-#lines(long$day,predict(m),col="red",lty=3,lwd=2)
 
 
 ############################################# 
 ####################
-#################### Total count plot: It should compile if the data presents a logistic curve
+#################### Total count plot: It should present with a good fir with a non linear logistic model
 ####################
 #############################################
 
@@ -86,40 +74,43 @@ colnames(long)<- c("country","date","count")
 long$day<-1:nrow(long)
 
 
-#find the parameters for the equation
-SS<-getInitial(count~SSlogis(day,alpha,xmid,scale),data=data.frame(count=long$count,day=long$day))
+##find the parameters for the equation
+#SS<-getInitial(count~SSlogis(day,alpha,xmid,scale),data=data.frame(count=long$count,day=long$day))
 
-#we used a different parametrization
-K_start<-SS["alpha"]
-R_start<-1/SS["scale"]
-N0_start<-SS["alpha"]/(exp(SS["xmid"]/SS["scale"])+1)
-#the formula for the model
-log_formula<-formula(count~K*N0*exp(R*day)/(K+N0*(exp(R*day)-1)))
-#fit the model
-m<-nls(log_formula,start=list(K=K_start,R=R_start,N0=N0_start), data = long)
-#estimated parameters
+# #we used a different parametrization
+# K_start<-SS["alpha"]
+# R_start<-1/SS["scale"]
+# N0_start<-SS["alpha"]/(exp(SS["xmid"]/SS["scale"])+1)
+# #the formula for the model
+# log_formula<-formula(count~K*N0*exp(R*day)/(K+N0*(exp(R*day)-1)))
+# #fit the model
+# m<-nls(log_formula,start=list(K=K_start,R=R_start,N0=N0_start), data = long)
+# #estimated parameters
+# summary(m)
+# #get some estimation of goodness of fit
+# cor(long$count,predict(m))
+
+
+
+#plot(long$day,long$count, main = paste(country, ":Total count of new cases"))
+#lines(long$day,predict(m),col="red",lty=2,lwd=3)
+
+
+# uncomment this if the self-determining function breaks
+a_start<-100000 # asymptote I havet 100000 as a place where I would def expect this virus to have a plateau
+
+
+phi<-coef(lm(logit(count/100000)~day,data=long))
+
+m<-nls(count~a/(1+exp(-(b+g*day))), start=list(a=100000,b=phi[1],g=phi[2]),data=long)
+
 summary(m)
+
 #get some estimation of goodness of fit
 cor(long$count,predict(m))
 
-plot(long$day,long$count)
-lines(long$day,predict(m),col="red",lty=2,lwd=3)
+plot(long$day,long$count, main = paste(country, ":Total count of new cases"))
+lines(long$day,predict(m),col="red",lty=3,lwd=2)
 
-
-# uncomment this if the distribution is just exponential
-#a_start<-33 #param a is the y value when x=0
-#b_start<-2*log(2)/a_start #b is the decay rate
-
-#m<-nls(count~a*exp(b*day),start=list(a=a_start,b=b_start), data = long)
-
-#summary(m)
-
-#get some estimation of goodness of fit
-#cor(long$count,predict(m))
-
-
-#plot(long$day,long$count)
-#lines(long$day,predict(m),col="red",lty=3,lwd=2)
-
-
-
+day <-nrow(long)
+coef(m)[1]/(1+exp(-(coef(m)[2]+coef(m)[3]*day)))
