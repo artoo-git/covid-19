@@ -1,7 +1,7 @@
 
 ######################################################################################
 
-###                                 Online Data South Korea
+###                                 Online Data Italy
 
 #####################################################################################
 
@@ -100,9 +100,9 @@ long$day<-1:nrow(long)
 a_start<-100000 # asymptote I havet 100000 as a place where I would def expect this virus to have a plateau
 
 
-phi<-coef(lm(logit(count/100000)~day,data=long))
+phi<-coef(lm(logit(count/a_start)~day,data=long))
 
-m<-nls(count~a/(1+exp(-(b+g*day))), start=list(a=100000,b=phi[1],g=phi[2]),data=long)
+m<-nls(count~a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=long)
 
 summary(m)
 
