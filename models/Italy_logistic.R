@@ -123,6 +123,6 @@ lines(long$day,predict(m),col="red",lty=3,lwd=2)
 
 
 ################################# Extrapolate
-predict(m, newdata =  data.frame(day = 49:89))
+predict(m, newdata =  data.frame(day = 49:89)) # set the day or days of predition ( caution, the CI will be huge with small datasets)
 # 
 
