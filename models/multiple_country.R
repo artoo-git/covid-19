@@ -31,6 +31,8 @@ long <- melt(subset, id.vars = c("Country.Region"))
 
 long$Country.Region<- droplevels(long$Country.Region)
 
+
+
 #############################################
 ####################
 #################### observed daily count plot: It should not look exponential if national counter-measures are working
@@ -63,7 +65,6 @@ ggplot(data = long, aes(x=day, y=count, colour=country)) +
   geom_line(data = long, aes(x=day, y=count, colour = country))
   ggtitle(paste(country, ":everyday count of new cases"))
 
-#plot(long$day,long$count, main = paste(country, ":everyday count of new cases"))
 #############################################
 ####################
 #################### Total count plot: It should present with a good fir with a non linear logistic model
