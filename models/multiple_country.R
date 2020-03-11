@@ -106,10 +106,10 @@ long$day<-as.numeric(long$day)
 
 #uncomment this if the self-determining function breaks
 
-predictdf<-data.frame()
+predictdf<-data.frame() # this df is to rbind extrapolated values and counts for ggplot
 
 i<-1
-for (c in country){
+for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
   
   subs<-long[which(long$country == c),]
   outbr_day <- min(which(subs$count >15))
