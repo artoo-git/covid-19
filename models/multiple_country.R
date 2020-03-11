@@ -76,7 +76,12 @@ long$Country.Region<- droplevels(long$Country.Region)
 colnames(long)<- c("country","day","count")
 long$day<-as.numeric(long$day)
 
+########################################################
+######  self-determination of the start parameters. 
+# This sometimes breaks or is undeterminated. it is commented out in favour of a more
+# brutal approach
 # #find the parameters for the equation
+# the 
 #  SS<-getInitial(count~SSlogis(day,alpha,xmid,scale),data=data.frame(count=long$count,day=long$day))
 #
 # #we used a different parametrization
@@ -94,6 +99,11 @@ long$day<-as.numeric(long$day)
 #
 # plot(long$day,long$count, main = paste(country, ":Total count of new cases"))
 # lines(long$day,predict(m),col="red",lty=2,lwd=3)
+################################################
+
+
+## A "brutal" approach to help the nls() model converge
+
 #uncomment this if the self-determining function breaks
 
 predictdf<-data.frame()
@@ -105,7 +115,7 @@ for (c in country){
   outbr_day <- min(which(subs$count >15))
   subs<-subs[which(subs$day > outbr_day),] # removing the zero counts to facilitate convergence
   
-  a_start<-max(subs$count)*1.30# asymptote I have 100000 as a place where I would def expect this virus to have a plateau
+  a_start<-max(subs$count)*1.30 # Setting a theoretical plateau 30% more than the current max value. This maybe a wrong approach
   logit(subs$count/a_start)
   phi<-coef(lm(logit(subs$count/a_start)~day,data=subs))
   m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
