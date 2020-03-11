@@ -1,6 +1,6 @@
 ######################################################################################
 
-###                                 Online Data Italy
+###                                 Online Data 
 
 #####################################################################################
 
@@ -9,12 +9,12 @@
 #https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv
 
 #####################
-country = "Italy" 
+country = "France" 
 ####################
 
 par(mfrow=c(2,1))
 
-data<-read.csv(file = "/home/diego/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
 
 data<-data %>% select(2,5:ncol(data))
 
@@ -33,13 +33,13 @@ long <- melt(subset, id.vars = c("Country.Region"))
 colnames(long)<- c("country","date","total")
 
 
-long$day<-1:length(long$date)
+long$day<-1:nrow(long)
 
 long$count <- 1 #initialize a count variable
 i<-1
 
 # calculate  the difference in scores to model the daily increase and not the total count
-while (i <= length(long$day)){
+while (i <= nrow(long)){
   if(long$total[i] > 1){
     long$count[i]<-long$total[i]-long$total[i-1]
   }else{
@@ -97,6 +97,5 @@ cor(long$count,predict(m))
 plot(long$day,long$count, main = paste(country, ":Total count of new cases"))
 lines(long$day,predict(m),col="red",lty=3,lwd=2)
 
-day <-nrow(long)
-coef(m)[1]*exp((coef(m)[2]*day))
+predict(m, newdata =  data.frame(day = 1:49))
 
