@@ -1,10 +1,9 @@
-
 ######################################################################################
 
 ###                                 Online Data Multiple country
 
 #####################################################################################
-# Thanks to Alaan Rathery for the input on ggplots
+
 
 library(dplyr)
 library(reshape2)
@@ -15,7 +14,7 @@ library(ggplot2)
 
 #####################
 
-          country = c("Italy","France","UK","Germany","Republic of Korea")
+          country = c("Italy","Republic of Korea","France","UK","Germany","Spain")
 
 ####################
 
@@ -59,6 +58,7 @@ while (i <= nrow(long)){
 }
 ggplot(data = long, aes(x=day, y=count, colour=country)) +
   geom_point() +
+  geom_line(data = long, aes(x=day, y=count, colour = country))
   ggtitle(paste(country, ":everyday count of new cases"))
 
 #plot(long$day,long$count, main = paste(country, ":everyday count of new cases"))
@@ -102,10 +102,10 @@ i<-1
 for (c in country){
   
   subs<-long[which(long$country == c),]
-  outbr_day <- min(which(subs$count >13))
+  outbr_day <- min(which(subs$count >15))
   subs<-subs[which(subs$day > outbr_day),] # removing the zero counts to facilitate convergence
   
-  a_start<-15000# asymptote I havet 100000 as a place where I would def expect this virus to have a plateau
+  a_start<-max(subs$count)*1.30# asymptote I have 100000 as a place where I would def expect this virus to have a plateau
   logit(subs$count/a_start)
   phi<-coef(lm(logit(subs$count/a_start)~day,data=subs))
   m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
@@ -127,7 +127,9 @@ for (c in country){
   i<-i+1
 }
 
+sysdate<-Sys.Date() %>% format(format="%B %d %Y")
+
 ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
-  ggtitle(paste(country, ":Total count of new cases"))+
+  ggtitle(paste(country, ":Total count of new cases. Updated", sysdate))+
   geom_line(data = predictdf, aes(x=day, y=predict, colour = country))
