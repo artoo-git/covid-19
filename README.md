@@ -1,5 +1,5 @@
 # covid-19
-Non-linear logistic regression models for south korea and italy
+Non-linear logistic regression models for the Covid-19 outbreak
 
 Just two snippets to plot models and prediction on the covid-19 outbreak data
 
