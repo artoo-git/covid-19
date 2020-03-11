@@ -1,9 +1,11 @@
 ######################################################################################
 
-###                                 Online Data Multiple country
+###                                 Online Data Multiple country (please contribute)
 
 #####################################################################################
-
+#
+# Thanks to Alaan Rathery for the suggestion of ggplot and with the binding of the prediction dataframe
+#
 
 library(dplyr)
 library(reshape2)
@@ -14,7 +16,7 @@ library(ggplot2)
 
 #####################
 
-          country = c("Italy","Republic of Korea","France","UK","Germany","Spain")
+          country = c("Italy","Republic of Korea","France","UK","Germany")
 
 ####################
 
@@ -31,7 +33,7 @@ long$Country.Region<- droplevels(long$Country.Region)
 
 #############################################
 ####################
-#################### observed daily count plot: It should not look exponential if measures are working
+#################### observed daily count plot: It should not look exponential if national counter-measures are working
 ####################
 #############################################
 
