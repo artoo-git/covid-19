@@ -86,10 +86,15 @@ long$day<-as.numeric(long$day)
   m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
   
   ################### Bootstrap
-  n.Iter<-400
+  n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
   bootL<- nlsBoot(m, niter = n.Iter)
   hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
+  abline(v=bootL$estiboot[1,1], col = "blue")
+  text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
   
+  n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
+  bootL<- nlsBoot(m, niter = n.Iter)
+  hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
   x<-1:60
   Param_Boo<-bootL$coefboot
   curveDF <- data.frame(matrix(0,ncol = 3,nrow =n.Iter*length(x)))
@@ -103,10 +108,12 @@ long$day<-as.numeric(long$day)
       curveDF[j+(i-1)*n.Iter,3] <- x[j]
     }
   }
-  colnames(curveDF) <- c('ys','bsP','xs')
+  colnames(curveDF) <- c('count','bsP','day')
   
-  ggplot(curveDF, aes(x=xs, y=ys, group=bsP)) +
-    geom_line() +
+  ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
+    geom_line(color="blue") +
+    geom_vline(xintercept = max(subs$day),linetype = "dashed")+
+    annotate("text", x = max(subs$day+10), y = max(subs$count), label = sysdate)+
     ggtitle(paste("Curves for bootstrapped plateau for Italy as per",sysdate))
   
   
