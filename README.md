@@ -1,6 +1,8 @@
 # covid-19
 Non-linear logistic regression models for the Covid-19 outbreak
 
+Data source is the [Johns Hopkins University](https://github.com/CSSEGISandData/COVID-19) repo.
+
 Just two snippets to plot models and prediction on the covid-19 outbreak data
 
 These are definetly far from perfect and I would not trust myself with the results so please use with caution. This is code that is meant to be used to learn about logistic regression.
