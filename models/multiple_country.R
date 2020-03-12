@@ -16,18 +16,30 @@ library(ggplot2)
 
 #####################
 
-          country = c("Italy","Republic of Korea","France","UK","Germany","Switzerland","Iran (Islamic Republic of)")
+          country = c("Italy","United Kingdom","France","Germany")
 
 ####################
 
-#data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
-data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
+data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+#data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
 
-data<-data %>% select(2,5:ncol(data))
-
+data<-data %>% select(1:2,5:ncol(data))
 #subset<-data[which(data$Country.Region == country),]
 
-subset<-data %>% filter_all(all_vars(Country.Region %in% country))
+# the csv has inconsistent ways to name UK ( AS USUALLY happens with Great britain, UK, United Kingdom)
+levels(data$Province.State) <- c(levels(data$Province.State),"United Kingdom")
+data[data=="UK"]<-as.character("United Kingdom") 
+
+# Adding Diamond Princess
+levels(data$Country.Region) <- c(levels(data$Country.Region),"Diamond Princess")
+data[data=="Cruise Ship"]<-as.character("Diamond Princess")
+
+# Subsetting
+subset<-data %>% filter_all(all_vars(Country.Region %in% c(country,"Diamond Princess")))
+subset<-subset %>% filter_all(all_vars(Province.State %in% c(country,"Diamond Princess","")))
+subset<- subset %>% select(2:ncol(data))
+
+  
 names(subset) <- c("Country.Region",1:(ncol(subset)-1))
 
 
@@ -66,22 +78,21 @@ while (i <= nrow(long)){
   }
   i<-i+1
 }
+
+sysdate<-Sys.Date() %>% format(format="%B %d %Y")
+
 ggplot(data = long, aes(x=day, y=count, colour=country)) +
   geom_point() +
   geom_line(data = long, aes(x=day, y=count, colour = country))+
-  ggtitle(paste("Everyday count of new cases"))
+  geom_smooth(aes(colour = country), family = gaussian(link = "identity"))+
+  ggtitle(paste("Everyday count of new cases as per: ", sysdate))
 
-#############################################
+  #############################################
 ####################
 #################### Total count plot: It should present with a good fir with a non linear logistic model
 ####################
 #############################################
-#subset<-data[which(data$Country.Region == country),]
 
-subset<-data %>% filter_all(all_vars(Country.Region %in% country))
-names(subset) <- c("Country.Region",1:(ncol(subset)-1))
-long <- melt(subset, id.vars = c("Country.Region"))
-long$Country.Region<- droplevels(long$Country.Region)
 colnames(long)<- c("country","day","count")
 long$day<-as.numeric(long$day)
 
