@@ -16,10 +16,13 @@ library(ggplot2)
 
 #####################
 
-          country = c("Italy","United Kingdom","France","Germany")
+          country = c("United Kingdom","Italy","France","Germany","Iran")
 
 ####################
-
+          
+# adding Diamond Princess by default
+#country = c(country,"Diamond Princess")
+          
 data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
 #data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
 
@@ -35,8 +38,8 @@ levels(data$Country.Region) <- c(levels(data$Country.Region),"Diamond Princess")
 data[data=="Cruise Ship"]<-as.character("Diamond Princess")
 
 # Subsetting
-subset<-data %>% filter_all(all_vars(Country.Region %in% c(country,"Diamond Princess")))
-subset<-subset %>% filter_all(all_vars(Province.State %in% c(country,"Diamond Princess","")))
+subset<-data %>% filter_all(all_vars(Country.Region %in% country))
+subset<-subset %>% filter_all(all_vars(Province.State %in% c(country,"")))
 subset<- subset %>% select(2:ncol(data))
 
   
@@ -61,7 +64,7 @@ colnames(long)<- c("country","day","total")
 
 long$day<-as.numeric(long$day)
 
-long$count <- 0 #initialize a count variable
+long$daily <- 0 #initialize a count variable
 
 i<-1
 # calculate  the difference in scores to model the daily increase and not the total count
@@ -72,28 +75,28 @@ while (i <= nrow(long)){
   cntr<-long$country[i]
   if(total > 1 & day >1){
     prev_tot<-long[which(long$country == cntr & long$day == (day-1)),][3]
-    long$count[i]<-as.numeric(total - prev_tot)
+    long$daily[i]<-as.numeric(total - prev_tot)
   }else{
-    long$count[i]<-as.numeric(long$total[i])
+    long$daily[i]<-as.numeric(long$total[i])
   }
   i<-i+1
 }
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
-ggplot(data = long, aes(x=day, y=count, colour=country)) +
+ggplot(data = long, aes(x=day, y=daily, colour=country)) +
   geom_point() +
-  geom_line(data = long, aes(x=day, y=count, colour = country))+
-  geom_smooth(aes(colour = country), family = gaussian(link = "identity"))+
+  geom_line(data = long, aes(x=day, y=daily, colour = country))+
+  geom_smooth(aes(colour = country))+#, family = poisson(link = "log"))+
   ggtitle(paste("Everyday count of new cases as per: ", sysdate))
 
-  #############################################
+#############################################
 ####################
 #################### Total count plot: It should present with a good fir with a non linear logistic model
 ####################
 #############################################
 
-colnames(long)<- c("country","day","count")
+colnames(long)<- c("country","day","count","daily")
 long$day<-as.numeric(long$day)
 
 ########################################################
@@ -104,12 +107,16 @@ long$day<-as.numeric(long$day)
 
 
 predictdf<-data.frame() # this df is to rbind extrapolated values and counts for ggplot
-i<-1
+
 for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
   
   subs<-long[which(long$country == c),]
-  outbr_day <- min(which(subs$count >15)) # set a minimum of 20 cases to facilitate convergence
-  subs<-subs[which(subs$day > outbr_day),] 
+  outbr_day <- min(which(subs$count >25)) # set a minimum of 20 cases to facilitate convergence
+  subs<-subs[which(subs$day >= outbr_day),] 
+  
+  # setting outbreak day to one. Comment this to see the delay start
+  subs$day<-1:nrow(subs)
+  outbr_day<-1 
   
   # estimation of start point and growth rate
   SS<-getInitial(count~SSlogis(day,alpha,xmid,scal),data=data.frame(count=subs$count,day=subs$day)) 
@@ -128,22 +135,22 @@ for (c in country){ # loops around the country selected, runs nls(), and builds 
   #get some estimation of goodness of fit
   cor(subs$count,predict(m))
   
-  days<-((outbr_day+1):60) # number of day for plot and extrapolation
+  days<-((outbr_day):25) # number of day for plot and extrapolation
   predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
-  cc<-rep(c, each = 60-outbr_day) # create the factor "country" column
+  cc<-rep(c, each = 26-outbr_day) # create the factor "country" column
   
   count_temp<-subs$count  # prepare a column with real counts
   length(count_temp) = length(cc) # fill NA where no data is present
   
   predictdf<-(rbind(predictdf,data.frame(count = count_temp,predict,day=days,country=cc))) # assemble the dataframe
-  
-  i<-i+1
 }
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
 ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
-  scale_y_continuous(breaks = seq(0, 30000, len = 11))+
-  ggtitle(paste("Count (dots) and prediction (line) of total cases. Updated", sysdate))+
-  geom_line(data = predictdf, aes(x=day, y=predict, colour = country))
+  scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+
+  geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
+  labs(title = "Cov-19 growth by country (dots) and extrapolation (line) at 60 days",
+       subtitle = "Plots assumes all started the same day",
+       caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
