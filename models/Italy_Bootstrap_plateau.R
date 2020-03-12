@@ -4,8 +4,6 @@
 
 #####################################################################################
 #
-# Thanks to Alaan Rathery for the suggestion of ggplot and with the binding of the prediction dataframe
-#
 
 library(dplyr)
 library(reshape2)
@@ -88,9 +86,9 @@ long$day<-as.numeric(long$day)
   m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
   
   ################### Bootstrap
-  n.Iter<-200
+  n.Iter<-400
   bootL<- nlsBoot(m, niter = n.Iter)
-  hist(bootL$coefboot[,1], breaks = 100, main = "boostrap value of extrapolated value of plateau for Italy")
+  hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
   
   x<-1:60
   Param_Boo<-bootL$coefboot
