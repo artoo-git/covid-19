@@ -2,3 +2,5 @@
 .Rhistory
 .RData
 .Ruserdata
+covid-19.Rproj
+.gitignore
