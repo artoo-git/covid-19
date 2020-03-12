@@ -16,11 +16,13 @@ library(ggplot2)
 
 #####################
 
-          country = c("Italy","Republic of Korea","France","UK","Germany")
+          country = c("Italy","Republic of Korea","France","UK","Germany","Switzerland","Iran (Islamic Republic of)")
 
 ####################
 
-data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+#data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
+
 data<-data %>% select(2,5:ncol(data))
 
 #subset<-data[which(data$Country.Region == country),]
@@ -62,8 +64,8 @@ while (i <= nrow(long)){
 }
 ggplot(data = long, aes(x=day, y=count, colour=country)) +
   geom_point() +
-  geom_line(data = long, aes(x=day, y=count, colour = country))
-  ggtitle(paste(country, ":everyday count of new cases"))
+  geom_line(data = long, aes(x=day, y=count, colour = country))+
+  ggtitle(paste("Everyday count of new cases"))
 
 #############################################
 ####################
@@ -80,47 +82,30 @@ colnames(long)<- c("country","day","count")
 long$day<-as.numeric(long$day)
 
 ########################################################
-######  self-determination of the start parameters. 
-# This sometimes breaks or is undeterminated. it is commented out in favour of a more
-# brutal approach
-# #find the parameters for the equation
-# the 
-#  SS<-getInitial(count~SSlogis(day,alpha,xmid,scale),data=data.frame(count=long$count,day=long$day))
+######  self-determination of the starts parameters. 
+# This sometimes breaks or is undeterminated. 
 #
-# #we used a different parametrization
-#  K_start<-SS["alpha"]
-#  R_start<-1/SS["scale"]
-#  N0_start<-SS["alpha"]/(exp(SS["xmid"]/SS["scale"])+1)
-#  #the formula for the model
-#  log_formula<-formula(count~K*N0*exp(R*day)/(K+N0*(exp(R*day)-1)))
-#  #fit the model
-#  m<-nls(log_formula,start=list(K=K_start,R=R_start,N0=N0_start), data = long)
-#  #estimated parameters
-#  summary(m)
-#  #get some estimation of goodness of fit
-#  cor(long$count,predict(m))
-#
-# plot(long$day,long$count, main = paste(country, ":Total count of new cases"))
-# lines(long$day,predict(m),col="red",lty=2,lwd=3)
-################################################
+#find the parameters for the equation
 
-
-## A "brutal" approach to help the nls() model converge
-
-#uncomment this if the self-determining function breaks
 
 predictdf<-data.frame() # this df is to rbind extrapolated values and counts for ggplot
-
 i<-1
 for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
   
   subs<-long[which(long$country == c),]
-  outbr_day <- min(which(subs$count >15))
-  subs<-subs[which(subs$day > outbr_day),] # removing the zero counts to facilitate convergence
+  outbr_day <- min(which(subs$count >15)) # set a minimum of 20 cases to facilitate convergence
+  subs<-subs[which(subs$day > outbr_day),] 
   
-  a_start<-max(subs$count)*1.30 # Setting a theoretical plateau 30% more than the current max value. This maybe a wrong approach
-  logit(subs$count/a_start)
-  phi<-coef(lm(logit(subs$count/a_start)~day,data=subs))
+  # estimation of start point and growth rate
+  SS<-getInitial(count~SSlogis(day,alpha,xmid,scal),data=data.frame(count=subs$count,day=subs$day)) 
+  
+  # Setting the upper asyntote (lower asyntote is zero)
+  a_start<-SS["alpha"]
+  
+  #logit(subs$count/a_start) # just a debug output
+  phi<-coef(lm(logit(subs$count/a_start)~day,data=subs)) # another way of estimating the growth rate
+  
+  #logistic model - I think is the same as the Richards Logistic Growth model
   m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
   
   summary(m)
@@ -144,5 +129,6 @@ sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
 ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
-  ggtitle(paste(country, ":Total count of new cases. Updated", sysdate))+
+  scale_y_continuous(breaks = seq(0, 30000, len = 11))+
+  ggtitle(paste("Count (dots) and prediction (line) of total cases. Updated", sysdate))+
   geom_line(data = predictdf, aes(x=day, y=predict, colour = country))
