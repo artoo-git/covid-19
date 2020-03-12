@@ -16,13 +16,11 @@ library(ggplot2)
 
 #####################
 
-          country = c("United Kingdom","Italy","France","Germany","Iran")
+          country = c("United Kingdom","Italy","France","Germany","Iran","Korea, South")
 
 ####################
           
-# adding Diamond Princess by default
-#country = c(country,"Diamond Princess")
-          
+
 data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
 #data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
 
@@ -33,9 +31,6 @@ data<-data %>% select(1:2,5:ncol(data))
 levels(data$Province.State) <- c(levels(data$Province.State),"United Kingdom")
 data[data=="UK"]<-as.character("United Kingdom") 
 
-# Adding Diamond Princess
-levels(data$Country.Region) <- c(levels(data$Country.Region),"Diamond Princess")
-data[data=="Cruise Ship"]<-as.character("Diamond Princess")
 
 # Subsetting
 subset<-data %>% filter_all(all_vars(Country.Region %in% country))
@@ -87,7 +82,7 @@ sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 ggplot(data = long, aes(x=day, y=daily, colour=country)) +
   geom_point() +
   geom_line(data = long, aes(x=day, y=daily, colour = country))+
-  geom_smooth(aes(colour = country))+#, family = poisson(link = "log"))+
+#  geom_smooth(aes(colour = country))+#, family = poisson(link = "log"))+
   ggtitle(paste("Everyday count of new cases as per: ", sysdate))
 
 #############################################
@@ -111,11 +106,12 @@ predictdf<-data.frame() # this df is to rbind extrapolated values and counts for
 for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
   
   subs<-long[which(long$country == c),]
-  outbr_day <- min(which(subs$count >25)) # set a minimum of 20 cases to facilitate convergence
+  outbr_day <- min(which(subs$count >33)) # set a minimum of 20 cases to facilitate convergence
   subs<-subs[which(subs$day >= outbr_day),] 
+  subs$day<-1:nrow(subs)
+  print(paste(subs$day[1],subs$count[1],subs$country[1]))
   
   # setting outbreak day to one. Comment this to see the delay start
-  subs$day<-1:nrow(subs)
   outbr_day<-1 
   
   # estimation of start point and growth rate
@@ -135,22 +131,28 @@ for (c in country){ # loops around the country selected, runs nls(), and builds 
   #get some estimation of goodness of fit
   cor(subs$count,predict(m))
   
-  days<-((outbr_day):25) # number of day for plot and extrapolation
+  limit<-30 # prediction limit
+  days<-((outbr_day):limit) # number of day for plot and extrapolation
+  
   predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
-  cc<-rep(c, each = 26-outbr_day) # create the factor "country" column
+  cc<-rep(c, each = limit) # create the factor "country" column
   
   count_temp<-subs$count  # prepare a column with real counts
   length(count_temp) = length(cc) # fill NA where no data is present
+ 
   
   predictdf<-(rbind(predictdf,data.frame(count = count_temp,predict,day=days,country=cc))) # assemble the dataframe
 }
+#predict(m, newdata =  data.frame(day = days))
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
 ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
-  scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+
+  scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  #scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-  labs(title = "Cov-19 growth by country (dots) and extrapolation (line) at 60 days",
+  labs(title = "Cov-19 growth by country (dots) and extrapolation (line)",
        subtitle = "Plots assumes all started the same day",
        caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
+
