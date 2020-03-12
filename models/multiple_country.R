@@ -29,7 +29,11 @@ data<-data %>% select(2,5:ncol(data))
 
 subset<-data %>% filter_all(all_vars(Country.Region %in% country))
 names(subset) <- c("Country.Region",1:(ncol(subset)-1))
+
+
 long <- melt(subset, id.vars = c("Country.Region"))
+
+#long<- long[which(long$value != 0),]# select all rows with zero counts for deletion
 
 long$Country.Region<- droplevels(long$Country.Region)
 
