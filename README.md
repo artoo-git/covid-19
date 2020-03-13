@@ -11,15 +11,15 @@ basic reference to non linear logistic models in R can be found at [datasciencep
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
 
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot01.png)
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITmodel.png)
 
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot02.png)
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITplateau.png)
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/UKmodel.png)
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/UKplateau.png)
 
 
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/FranceModel.png)
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/FRmodel.png)
 
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Franceplateau.png)
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/FRplateau.png)
