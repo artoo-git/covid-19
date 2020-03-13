@@ -38,23 +38,28 @@ subset<-subset %>% filter_all(all_vars(Province.State %in% c(country,"")))
 subset<- subset %>% select(2:ncol(data))
 
   
-names(subset) <- c("Country.Region",1:(ncol(subset)-1))
+names(subset) <- c("Country.Region",(1:(ncol(subset)-1)))
 
 
-long <- melt(subset, id.vars = c("Country.Region"))
+long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
 
 #long<- long[which(long$value != 0),]# select all rows with zero counts for deletion
 
 long$Country.Region<- droplevels(long$Country.Region)
 
-
+#currently 13/03/20:10h10 GMT csv is wrong on the totals correcting
+#####################################################################
+long[which(long$country=="Italy" & long$day==51),3]<-15113          #
+long[which(long$country=="United Kingdom" & long$day==51),3]<-590   #
+long[which(long$country=="France" & long$day==51),3]<-2876          #
+#####################################################################
 
 #############################################
 ####################
 #################### observed daily count plot: It should not look exponential if national counter-measures are working
 ####################
 #############################################
-
+#long[which(long$day==50|long$day==51),]
 colnames(long)<- c("country","day","total")
 
 long$day<-as.numeric(long$day)

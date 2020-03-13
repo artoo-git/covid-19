@@ -4,6 +4,7 @@
 
 #####################################################################################
 #
+# rm(list = ls()) # cleaning the environment
 
 library(dplyr)
 library(reshape2)
@@ -18,7 +19,7 @@ library(boot)
           country = c("United Kingdom")
 
 ####################
-          
+
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
 data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
@@ -38,12 +39,12 @@ subset<-subset %>% filter_all(all_vars(Province.State %in% c(country,"")))
 subset<- subset %>% select(2:ncol(data))
 
   
-names(subset) <- c("Country.Region",1:(ncol(subset)-1))
 
+names(subset) <- c("Country.Region",paste("day.",(1:(ncol(subset)-1)),sep = ""))
 
-long <- melt(subset, id.vars = c("Country.Region"))
+long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
+long[51,3] <-590 # csv is wrong
 
-#long<- long[which(long$value != 0),]# select all rows with zero counts for deletion
 
 long$Country.Region<- droplevels(long$Country.Region)
 
@@ -88,10 +89,13 @@ long$day<-as.numeric(long$day)
   ################### Bootstrap
   n.Iter<-5000 ### 
   bootL<- nlsBoot(m, niter = n.Iter)
-  hist(bootL$coefboot[,1], breaks = 200, main = paste("boostrap value of extrapolated value of plateau for ", country))
-  abline(v=bootL$estiboot[1,1], col = "blue")
-  text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
   
+  png("images/UKplateau.png", width = 600, height = 600, units = "px")
+    hist(bootL$coefboot[,1], breaks = 200, main = paste("boostrap value of extrapolated value of plateau for ", country))
+    abline(v=bootL$estiboot[1,1], col = "blue")
+    text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
+  dev.off()
+    
   n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
   bootL<- nlsBoot(m, niter = n.Iter)
   hist(bootL$coefboot[,1], breaks = 200, main = paste("boostrap value of extrapolated value of plateau for",country))
@@ -110,11 +114,12 @@ long$day<-as.numeric(long$day)
   }
   colnames(curveDF) <- c('count','bsP','day')
   
-  ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
-    geom_line(color="darkgreen") +
-    geom_vline(xintercept = max(subs$day),linetype = "dashed")+
-    annotate("text", x = max(subs$day+2), y = max(subs$count), label = sysdate)+
-    ggtitle(paste("Curves for bootstrapped plateau for ", country, " as per",sysdate))
-  
+  png("images/UKmodel.png", width = 600, height = 600, units = "px")
+    ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
+      geom_line(color="darkgreen") +
+      geom_vline(xintercept = max(subs$day),linetype = "dashed")+
+      annotate("text", x = max(subs$day+2), y = max(subs$count), label = sysdate)+
+      ggtitle(paste("Curves for bootstrapped plateau for ", country, " as per",sysdate))
+  dev.off()
   
   

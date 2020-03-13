@@ -30,7 +30,7 @@ data<-data %>% select(1:2,5:ncol(data))
 # the csv has inconsistent ways to name UK ( AS USUALLY happens with Great britain, UK, United Kingdom)
 levels(data$Province.State) <- c(levels(data$Province.State),"United Kingdom")
 data[data=="UK"]<-as.character("United Kingdom") 
-
+long[51,3] <-15133 # csv is wrong
 
 # Subsetting
 subset<-data %>% filter_all(all_vars(Country.Region %in% country))
@@ -38,12 +38,11 @@ subset<-subset %>% filter_all(all_vars(Province.State %in% c(country,"")))
 subset<- subset %>% select(2:ncol(data))
 
   
-names(subset) <- c("Country.Region",1:(ncol(subset)-1))
+names(subset) <- c("Country.Region",paste("day.",(1:(ncol(subset)-1)),sep = ""))
 
 
-long <- melt(subset, id.vars = c("Country.Region"))
-
-#long<- long[which(long$value != 0),]# select all rows with zero counts for deletion
+long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
+long[51,3] <-15113 # csv is wrong
 
 long$Country.Region<- droplevels(long$Country.Region)
 
@@ -88,14 +87,17 @@ long$day<-as.numeric(long$day)
   ################### Bootstrap
   n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
   bootL<- nlsBoot(m, niter = n.Iter)
-  hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
-  abline(v=bootL$estiboot[1,1], col = "blue")
-  text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
+  
+  png("images/ITplateau.png", width = 600, height = 600, units = "px")
+    hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
+    abline(v=bootL$estiboot[1,1], col = "blue")
+    text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
+  dev.off()
   
   n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
   bootL<- nlsBoot(m, niter = n.Iter)
   hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
-  x<-1:60
+  x<-1:40
   Param_Boo<-bootL$coefboot
   curveDF <- data.frame(matrix(0,ncol = 3,nrow =n.Iter*length(x)))
   for(i in 1:n.Iter){
@@ -110,11 +112,12 @@ long$day<-as.numeric(long$day)
   }
   colnames(curveDF) <- c('count','bsP','day')
   
-  ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
-    geom_line(color="blue") +
-    geom_vline(xintercept = max(subs$day),linetype = "dashed")+
-    annotate("text", x = max(subs$day+10), y = max(subs$count), label = sysdate)+
-    ggtitle(paste("Curves for bootstrapped plateau for Italy as per",sysdate))
-  
+  png("images/ITmodel.png", width = 600, height = 600, units = "px")
+    ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
+      geom_line(color="blue") +
+      geom_vline(xintercept = max(subs$day),linetype = "dashed")+
+      annotate("text", x = max(subs$day+10), y = max(subs$count), label = sysdate)+
+      ggtitle(paste("Curves for bootstrapped plateau for Italy as per",sysdate))
+  dev.off()
   
   

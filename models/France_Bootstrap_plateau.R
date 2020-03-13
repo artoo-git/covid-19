@@ -38,12 +38,11 @@ subset<-subset %>% filter_all(all_vars(Province.State %in% c(country,"")))
 subset<- subset %>% select(2:ncol(data))
 
   
-names(subset) <- c("Country.Region",1:(ncol(subset)-1))
+names(subset) <- c("Country.Region",paste("day.",(1:(ncol(subset)-1)),sep = ""))
 
 
-long <- melt(subset, id.vars = c("Country.Region"))
-
-#long<- long[which(long$value != 0),]# select all rows with zero counts for deletion
+long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
+long[51,3] <-2876 # csv is wrong
 
 long$Country.Region<- droplevels(long$Country.Region)
 
@@ -86,11 +85,15 @@ long$day<-as.numeric(long$day)
   m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
   
   ################### Bootstrap
-  n.Iter<-5000 ### 
+  n.Iter<-5000 ###
+  
   bootL<- nlsBoot(m, niter = n.Iter)
-  hist(bootL$coefboot[,1], breaks = 200, main = paste("boostrap of the upper asyntote values (plateau) for",country))
-  abline(v=bootL$estiboot[1,1], col = "blue")
-  text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
+  
+  png("images/FRplateau.png", width = 600, height = 600, units = "px")
+      hist(bootL$coefboot[,1], breaks = 300, main = paste("boostrap of the upper asyntote values (plateau) for",country))
+    abline(v=bootL$estiboot[1,1], col = "blue")
+    text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
+  dev.off()
   
   n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
   bootL<- nlsBoot(m, niter = n.Iter)
@@ -110,11 +113,12 @@ long$day<-as.numeric(long$day)
   }
   colnames(curveDF) <- c('count','bsP','day')
   
+  png("images/FRmodel.png", width = 600, height = 600, units = "px")
   ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
     geom_line(color="red") +
     geom_vline(xintercept = max(subs$day),linetype = "dashed")+
     annotate("text", x = max(subs$day+2), y = max(subs$count), label = sysdate)+
     ggtitle(paste("Curves for bootstrapped plateau for ", country, " as per",sysdate))
-  
+  dev.off()
   
   
