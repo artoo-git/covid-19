@@ -30,7 +30,6 @@ data<-data %>% select(1:2,5:ncol(data))
 # the csv has inconsistent ways to name UK ( AS USUALLY happens with Great britain, UK, United Kingdom)
 levels(data$Province.State) <- c(levels(data$Province.State),"United Kingdom")
 data[data=="UK"]<-as.character("United Kingdom") 
-long[51,3] <-15133 # csv is wrong
 
 # Subsetting
 subset<-data %>% filter_all(all_vars(Country.Region %in% country))

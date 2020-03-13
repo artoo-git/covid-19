@@ -46,7 +46,7 @@ long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Regio
 colnames(long)<- c("country","day","total")
 
 #long<- long[which(long$value != 0),]# select all rows with zero counts for deletion
-levels()
+
 droplevels(long$country)
 
 #currently 13/03/20:10h10 GMT csv is wrong on the totals correcting
