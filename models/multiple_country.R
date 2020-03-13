@@ -11,6 +11,7 @@ library(dplyr)
 library(reshape2)
 library(gtools)
 library(ggplot2)
+library(gridExtra)
 
 #https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv
 
@@ -42,10 +43,11 @@ names(subset) <- c("Country.Region",(1:(ncol(subset)-1)))
 
 
 long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
+colnames(long)<- c("country","day","total")
 
 #long<- long[which(long$value != 0),]# select all rows with zero counts for deletion
-
-long$Country.Region<- droplevels(long$Country.Region)
+levels()
+droplevels(long$country)
 
 #currently 13/03/20:10h10 GMT csv is wrong on the totals correcting
 #####################################################################
@@ -152,12 +154,25 @@ for (c in country){ # loops around the country selected, runs nls(), and builds 
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
-ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
-  geom_point() +
-  scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-  #scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-  geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-  labs(title = "Cov-19 growth by country (dots) and extrapolation (line)",
-       subtitle = "Plots assumes all started the same day",
-       caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
+png("images/Rplot06.png", width = 1000, height = 600, units = "px")
 
+plot1 <- ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
+            geom_point() +
+            scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+            #scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+            geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
+            labs( title = "Cov-19 growth by country (dots) and extrapolation (line)",
+                  subtitle = "Plot assumes all started the same day",
+                  caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
+plot2 <- ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
+  geom_point() +
+  #scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
+  labs( title = "Cov-19 growth by country (dots) and extrapolation (line)",
+        subtitle = "(log scale) Plot assumes all started the same day",
+        caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
+
+grid.arrange(plot1, plot2, ncol=2)
+
+dev.off()
