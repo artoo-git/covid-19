@@ -17,7 +17,7 @@ library(gridExtra)
 
 #####################
 
-          country = c("United Kingdom","Italy","France","Germany","Korea, South")
+          country = c("Italy","France")
 
 ####################
           
@@ -53,7 +53,7 @@ long$country<-droplevels(long$country)
 #currently 13/03/20:10h10 GMT csv is wrong on the totals correcting
 #####################################################################
 long[which(long$country=="Italy" & long$day==51),3]<-15113          #
-long[which(long$country=="United Kingdom" & long$day==51),3]<-590   #
+#long[which(long$country=="United Kingdom" & long$day==51),3]<-590   #
 long[which(long$country=="France" & long$day==51),3]<-2876          #
 #####################################################################
 
@@ -111,7 +111,6 @@ long$day<-as.numeric(long$day)
 
 predictdf<-data.frame() # this df is to rbind extrapolated values and counts for ggplot
 
-
 for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
   
   subs<-long[which(long$country == c),]
@@ -160,17 +159,16 @@ for (c in country){ # loops around the country selected, runs nls(), and builds 
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
-italystart<-min(predictdf[which(predictdf$country == "Italy"),][5], na.rm = T)
 xlab<-mean(predictdf$day)
 
-ylabUK<-max(long[which(long$country == "United Kingdom"),][3])
-startUK<-min(predictdf[which(predictdf$country == "United Kingdom"),][5], na.rm = T)
+IT1000<-min(predictdf[which(predictdf$country == "Italy" & predictdf$count>1000),][5], na.rm = T)
+#UK1000<-min(predictdf[which(predictdf$country == "United Kingdom" & predictdf$count>1000),][5], na.rm = T)
+FR1000<-min(predictdf[which(predictdf$country == "France" & predictdf$count>1000),][5], na.rm = T)
+
+#print(c(IT1000, UK1000, FR1000))
 
 ylabFrance<-max(long[which(long$country == "France"),][3])
-startFrance<-min(predictdf[which(predictdf$country == "France"),][5], na.rm = T)
 
-ylabGermany<-max(long[which(long$country == "Germany"),][3])
-startGermany<-min(predictdf[which(predictdf$country == "Germany"),][5], na.rm = T)
 
 
 png("images/Rplot06.png", width = 1000, height = 600, units = "px")
@@ -179,9 +177,9 @@ plot1 <- ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
             geom_point() +
             scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
             #scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-            geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-            annotate("text", x = 20, y = 10, label = paste("UK is ", (startUK - italystart),"days behind Italy"))+
-            annotate("text", x = 20, y = 20, label = paste("France is", (startFrance - italystart),"days behind Italy"))+
+     #       geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
+           # annotate("text", x = 20, y = 10, label = paste("UK is ", (startUK - italystart),"days behind Italy"))+
+            annotate("text", x = 20, y = 20, label = paste("France is", (FR1000 - IT1000),"days behind Italy"))+
             labs( title = "Cov-19 growth by country (dots) and extrapolation  (line)",
                   subtitle = "Plot assumes all started the same day",
                   caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
