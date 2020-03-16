@@ -10,6 +10,8 @@ library(reshape2)
 library(gtools)
 library(ggplot2)
 library(boot)
+library(nlstools)
+
 
 #https://github.com/CSSEGISandData/COVID-19/blob/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv
 
@@ -43,10 +45,10 @@ names(subset) <- c("Country.Region",paste("day.",(1:(ncol(subset)-1)),sep = ""))
 
 
 long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
-#long[51,3] <-15113 # csv is wrong
+long[51,3] <-1016 # csv is wrong
 
 long$Country.Region<- droplevels(long$Country.Region)
-
+long
 
 #############################################
 ####################
@@ -66,7 +68,7 @@ long$day<-as.numeric(long$day)
 
 
 subs<-long
-outbr_day <- min(which(subs$count >33)) # set a minimum of 20 cases to facilitate convergence
+outbr_day <- min(which(subs$count >10)) # set a minimum of 20 cases to facilitate convergence
 subs<-subs[which(subs$day >= outbr_day),] 
 subs$day<-1:nrow(subs)
 print(paste(subs$day[1],subs$count[1],subs$country[1]))
@@ -89,14 +91,17 @@ m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),dat
 n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 
+png("images/ITplateauD.png", width = 600, height = 600, units = "px")
 hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
 abline(v=bootL$estiboot[1,1], col = "blue")
 text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
+dev.off()
 
 n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
-x<-1:40
+
+x<-1:nrow(subs)
 Param_Boo<-bootL$coefboot
 curveDF <- data.frame(matrix(0,ncol = 3,nrow =n.Iter*length(x)))
 for(i in 1:n.Iter){
@@ -111,11 +116,19 @@ for(i in 1:n.Iter){
 }
 colnames(curveDF) <- c('count','bsP','day')
 
-#png("images/ITmodel.png", width = 600, height = 600, units = "px")
-ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
-  geom_line(color="blue") +
-  geom_vline(xintercept = max(subs$day),linetype = "dashed")+
-  annotate("text", x = max(subs$day+10), y = max(subs$count), label = sysdate)+
-  ggtitle(paste("Curves for bootstrapped plateau for Italy as per",sysdate))
-#dev.off()
+span<-1:(nrow(subs)+5)
+pred<-round(max(predict(m, newdata = data.frame(day=span),1)))
+lowbound<-min(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
+highbound<-max(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 
+png("images/ITmodelD.png", width = 600, height = 600, units = "px")
+ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
+  geom_line(color="dark grey") +
+  geom_vline(xintercept = max(subs$day),linetype = "dashed")+
+  annotate("text", hjust = 1, x = max(subs$day), y = max(subs$count), label = paste(max(subs$count), ". Count as per", sysdate))+
+  annotate("text", hjust = 1, x = max(span), y = pred, label = paste(pred, "estimated in 5 days"))+
+  annotate("text", hjust = 1, x = max(span), y = lowbound, label = lowbound)+
+  annotate("text", hjust = 1, x = max(span), y = highbound, label = highbound)+
+  ggtitle(paste("Projection of curves at 3 days for deaths in Italy as per",sysdate))
+dev.off()
+#predict(m, data = data.frame(24))

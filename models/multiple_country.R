@@ -54,7 +54,9 @@ long$country<-droplevels(long$country)
 #####################################################################
 long[which(long$country=="Italy" & long$day==51),3]<-15113          #
 #long[which(long$country=="United Kingdom" & long$day==51),3]<-590   #
-long[which(long$country=="France" & long$day==51),3]<-2876          #
+long[which(long$country=="France" & long$day==51),3]<-2876  
+long[which(long$country=="France" & long$day==54),3]<-5423 
+#
 #####################################################################
 
 #############################################
@@ -108,7 +110,6 @@ long$day<-as.numeric(long$day)
 #
 #find the parameters for the equation
 
-
 predictdf<-data.frame() # this df is to rbind extrapolated values and counts for ggplot
 
 for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
@@ -159,40 +160,38 @@ for (c in country){ # loops around the country selected, runs nls(), and builds 
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
-xlab<-mean(predictdf$day)
+lastCountFR<-max(long[which(long$country =="France"),][3])
+dayFR<-nrow(long[which(long$country =="France"),])
 
-IT1000<-min(predictdf[which(predictdf$country == "Italy" & predictdf$count>1000),][5], na.rm = T)
-#UK1000<-min(predictdf[which(predictdf$country == "United Kingdom" & predictdf$count>1000),][5], na.rm = T)
-FR1000<-min(predictdf[which(predictdf$country == "France" & predictdf$count>1000),][5], na.rm = T)
+# find nearest value for italy
+ITcounts<-long[which(long$country =="Italy"),][3]
+lower<-ITcounts[sum(ITcounts <=lastCountFR),]
+higher<-ITcounts[min(which(ITcounts>lastCountFR)),]
 
-#print(c(IT1000, UK1000, FR1000))
+if (abs(lower-lastCountFR)>abs(higher-lastCountFR)){
+  eqDayIT<-long[which(long$country =="Italy" & long$count == higher),][2]
+}else{
+  eqDayIT<-long[which(long$country =="Italy" & long$count == lower),][2]
+}
 
-ylabFrance<-max(long[which(long$country == "France"),][3])
+
+xlab<-mean(predictdf$day)/2
+ylabFrance<-max(long[which(long$country == "France"),][3]) /10
 
 
 
-png("images/Rplot06.png", width = 1000, height = 600, units = "px")
+png("images/Rplot06.png", width = 600, height = 600, units = "px")
 
-plot1 <- ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
-            geom_point() +
-            scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-            #scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-     #       geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-           # annotate("text", x = 20, y = 10, label = paste("UK is ", (startUK - italystart),"days behind Italy"))+
-            annotate("text", x = 20, y = 20, label = paste("France is", (FR1000 - IT1000),"days behind Italy"))+
-            labs( title = "Cov-19 growth by country (dots) and extrapolation  (line)",
-                  subtitle = "Plot assumes all started the same day",
-                  caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
-
-plot2 <- ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
+ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
-  #scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-  scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-  geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
+  scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  #scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
+  annotate("text", hjust =0, x = xlab, y = ylabFrance, label = paste("France is", (eqDayIT - dayFR),"days behind Italy"))+
   labs( title = "Cov-19 growth by country (dots) and extrapolation (line)",
         subtitle = "(log scale) Plot assumes all started the same day",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
 
-grid.arrange(plot1, plot2, ncol=2)
+#grid.arrange(plot1, plot2, ncol=2)
 
 dev.off()
