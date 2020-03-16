@@ -101,7 +101,9 @@ n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
 
-x<-1:nrow(subs)
+# span of prediction
+span<-1:(nrow(subs)+5)
+x<-span
 Param_Boo<-bootL$coefboot
 curveDF <- data.frame(matrix(0,ncol = 3,nrow =n.Iter*length(x)))
 for(i in 1:n.Iter){

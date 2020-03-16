@@ -87,6 +87,13 @@ while (i <= nrow(long)){
   i<-i+1
 }
 
+# daily<-long[which(long$country=="Italy"),][4]
+# num<-daily$daily
+# den<-c(1,num)[1:54]
+# long$growth<-0
+# long[which(long$country=="Italy"),][5]<-growth<-num/den
+# long[which(long$country=="Italy"),]
+
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
 ggplot(data = long, aes(x=day, y=daily, colour=country)) +
@@ -141,7 +148,7 @@ for (c in country){ # loops around the country selected, runs nls(), and builds 
   #get some estimation of goodness of fit
   cor(subs$count,predict(m))
   
-  limit<-30 # prediction limit
+  limit<-46 # prediction limit
   days<-((outbr_day):limit) # number of day for plot and extrapolation
   
   predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
@@ -156,7 +163,7 @@ for (c in country){ # loops around the country selected, runs nls(), and builds 
   
   predictdf<-(rbind(predictdf,data.frame(count = count_temp,predict,day=days,country=cc, absDay=absDay))) # assemble the dataframe
 }
-#predict(m, newdata =  data.frame(day = days))
+#predict(m, newdata =  data.frame(day = ))
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
