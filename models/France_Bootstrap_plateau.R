@@ -91,7 +91,7 @@ m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),dat
 n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 
-png("images/ITplateauD.png", width = 600, height = 600, units = "px")
+png("images/FRplateau.png", width = 600, height = 600, units = "px")
 hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for France")
 abline(v=bootL$estiboot[1,1], col = "blue")
 text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
@@ -121,9 +121,9 @@ pred<-round(max(predict(m, newdata = data.frame(day=span),1)))
 lowbound<-min(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 highbound<-max(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 
-png("images/ITmodelD.png", width = 600, height = 600, units = "px")
+png("images/FRmodel.png", width = 600, height = 600, units = "px")
 ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
-  geom_line(color="blue") +
+  geom_line(color="red") +
   geom_vline(xintercept = max(subs$day),linetype = "dashed")+
   annotate("text", hjust = 1, x = max(subs$day), y = max(subs$count), label = paste(max(subs$count), ". Count as per", sysdate))+
   annotate("text", hjust = 1, x = max(span), y = pred, label = paste(pred, "estimated in 5 days"))+
