@@ -221,6 +221,7 @@ png("images/Rplot06.png", width = 800, height = 800, units = "px")
 
 ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
+  geom_line()+
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   #scale_y_continuous(breaks = round(seq(0, max(long$count), len = 10),1))+ # breaks for linear y scale
   #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
@@ -231,7 +232,7 @@ ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_text(aes(x=FRlockdwn, y=0, label="FR lockdown"), size=4, angle=90, vjust=-0.4, hjust=0) +
   geom_text(aes(x=ITlockdwn, y=0, label="IT lockdown"), size=4, angle=90, vjust=-0.4, hjust=0) +
   guides(colour = "legend", linetype = "none")+
-  labs( title = "Cov-19 growth by country (dots) and extrapolation (line)",
+  labs( title = "Cov-19 growth by country (dots)",
         subtitle = "(log scale) Plot assumes all started the same day",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
 
