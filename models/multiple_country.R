@@ -188,8 +188,9 @@ if (abs(lower-lastCountFR)>abs(higher-lastCountFR)){
 }
 
 
-xlab<-mean(predictdf$day)*2/3
-ylabFrance<-max(predictdf[which(predictdf$country == "France"),][1]) /20
+xlab<-0
+ylabFrance<-max(predictdf[which(predictdf$country  == "Italy"),][1])
+
 ###############################################################
 
 ##############################################UK DELAY###############
@@ -207,10 +208,14 @@ if (abs(lower-lastCountUK)>abs(higher-lastCountUK)){
   eqDayITUK<-long[which(long$country =="Italy" & long$count == lower),][2] %>% as.numeric
 }
 
-xlab<-mean(predictdf$day)*2/3
-ylabUK<-max(predictdf[which(predictdf$country == "United Kingdom"),][1]) /20
+xlab<-0
+ylabUK<-max(predictdf[which(predictdf$country == "Italy"),][1])-10000
 ###############################################################
 
+FRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][2] %>% as.numeric
+ITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][2] %>% as.numeric
+
+#UKlockdwn
 
 png("images/Rplot06.png", width = 600, height = 600, units = "px")
 
@@ -221,6 +226,11 @@ ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
   annotate("text", hjust =0, x = xlab, y = ylabFrance, label = paste("France is", (dayFR - eqDayITFR),"days behind Italy"))+
   annotate("text", hjust =0, x = xlab, y = ylabUK, label = paste("UK is", (dayUK - eqDayITUK),"days behind Italy"))+
+  geom_vline(aes(xintercept=FRlockdwn), linetype = "dotted")+
+  geom_vline(aes(xintercept=ITlockdwn), linetype = "dotted")+
+  geom_text(aes(x=FRlockdwn, y=0, label="FR lockdown"), size=4, angle=90, vjust=-0.4, hjust=0) +
+  geom_text(aes(x=ITlockdwn, y=0, label="IT lockdown"), size=4, angle=90, vjust=-0.4, hjust=0) +
+  guides(colour = "legend", linetype = "none")+
   labs( title = "Cov-19 growth by country (dots) and extrapolation (line)",
         subtitle = "(log scale) Plot assumes all started the same day",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
