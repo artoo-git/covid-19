@@ -46,6 +46,7 @@ names(subset) <- c("Country.Region",paste("day.",(1:(ncol(subset)-1)),sep = ""))
 
 long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
 long[51,3] <-15113 # csv is wrong
+long[55,3]<-27980
 
 long$Country.Region<- droplevels(long$Country.Region)
 
@@ -130,4 +131,4 @@ ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
   annotate("text", hjust = 1, x = max(span), y = highbound, label = highbound)+
   ggtitle(paste("Projection of Total counts of cases 5 days for Italy as per",sysdate))
 dev.off()
-#predict(m, data = data.frame(24))
+predict(m, data = data.frame(25))

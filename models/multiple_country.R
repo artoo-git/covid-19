@@ -17,7 +17,7 @@ library(gridExtra)
 
 #####################
 
-          country = c("Italy","France")
+          country = c("Italy","France","United Kingdom")
 
 ####################
           
@@ -53,7 +53,8 @@ long$country<-droplevels(long$country)
 #currently 13/03/20:10h10 GMT csv is wrong on the totals correcting
 #####################################################################
 long[which(long$country=="Italy" & long$day==51),3]<-15113          #
-#long[which(long$country=="United Kingdom" & long$day==51),3]<-590   #
+long[which(long$country=="United Kingdom" & long$day==51),3]<-590   #
+long[which(long$country=="United Kingdom" & long$day==54),3]<-1393   #
 long[which(long$country=="France" & long$day==51),3]<-2876  
 long[which(long$country=="France" & long$day==54),3]<-5423 
 #
@@ -117,74 +118,98 @@ long$day<-as.numeric(long$day)
 #
 #find the parameters for the equation
 
-predictdf<-data.frame() # this df is to rbind extrapolated values and counts for ggplot
-
-for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
-  
-  subs<-long[which(long$country == c),]
-  outbr_day <- min(which(subs$count >33)) # set a minimum of 20 cases to facilitate convergence
-  subs<-subs[which(subs$day >= outbr_day),] 
-  subs$absDay<-subs$day
-  subs$day<-1:nrow(subs)
-  print(paste(subs$day[1],subs$count[1],subs$country[1]))
-  
-  # setting outbreak day to one. Comment this to see the delay start
-  outbr_day<-1 
-  
-  # estimation of start point and growth rate
-  SS<-getInitial(count~SSlogis(day,alpha,xmid,scal),data=data.frame(count=subs$count,day=subs$day)) 
-  
-  # Setting the upper asyntote (lower asyntote is zero)
-  a_start<-SS["alpha"]
-  
-  #logit(subs$count/a_start) # just a debug output
-  phi<-coef(lm(logit(subs$count/a_start)~day,data=subs)) # another way of estimating the growth rate
-  
-  #logistic model - I think is the same as the Richards Logistic Growth model
-  m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
-  
-  summary(m)
-  
-  #get some estimation of goodness of fit
-  cor(subs$count,predict(m))
-  
-  limit<-46 # prediction limit
-  days<-((outbr_day):limit) # number of day for plot and extrapolation
-  
-  predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
-  cc<-rep(c, each = limit) # create the factor "country" column
-  
-  count_temp<-subs$count  # prepare a column with real counts
-  length(count_temp) = length(cc) # fill NA where no data is present
- 
-  absDay<-subs$absDay
-  length(absDay) = length(cc)
-  
-  
-  predictdf<-(rbind(predictdf,data.frame(count = count_temp,predict,day=days,country=cc, absDay=absDay))) # assemble the dataframe
-}
+ predictdf<-data.frame() # this df is to rbind extrapolated values and counts for ggplot
+# 
+ for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
+#   
+   subs<-long[which(long$country == c),]
+   outbr_day <- min(which(subs$count >13)) # set a minimum of 20 cases to facilitate convergence
+   subs<-subs[which(subs$day >= outbr_day),] 
+   subs$absDay<-subs$day
+   subs$day<-1:nrow(subs)
+   print(paste(subs$day[1],subs$count[1],subs$country[1]))
+#   
+#   # setting outbreak day to one. Comment this to see the delay start
+   outbr_day<-1 
+#   
+#   # estimation of start point and growth rate
+#   SS<-getInitial(count~SSlogis(day,alpha,xmid,scal),data=data.frame(count=subs$count,day=subs$day)) 
+#   
+#   # Setting the upper asyntote (lower asyntote is zero)
+#   a_start<-SS["alpha"]
+#   
+#   #logit(subs$count/a_start) # just a debug output
+#   phi<-coef(lm(logit(subs$count/a_start)~day,data=subs)) # another way of estimating the growth rate
+#   
+#   #logistic model - I think is the same as the Richards Logistic Growth model
+#   m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
+#   
+#   summary(m)
+#   
+#   #get some estimation of goodness of fit
+#   cor(subs$count,predict(m))
+#   
+#   limit<-30 # prediction limit
+#   days<-((outbr_day):limit) # number of day for plot and extrapolation
+   days<-((outbr_day):nrow(subs)) # number of day for plot and extrapolation
+   
+   #   
+#   predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
+#   cc<-rep(c, each = limit) # create the factor "country" column
+    cc<-rep(c, each = nrow(subs))
+#   
+   count_temp<-subs$count  # prepare a column with real counts
+   length(count_temp) = length(cc) # fill NA where no data is present
+#  
+   absDay<-subs$absDay
+   length(absDay) = length(cc)
+#   
+#   
+#   predictdf<-(rbind(predictdf,data.frame(count = count_temp,predict,day=days,country=cc, absDay=absDay))) # assemble the dataframe
+   predictdf<-(rbind(predictdf,data.frame(count = count_temp,day=days,country=cc, absDay=absDay))) # assemble the dataframe
+ }
 #predict(m, newdata =  data.frame(day = ))
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
-lastCountFR<-max(long[which(long$country =="France"),][3])
-dayFR<-nrow(long[which(long$country =="France"),])
+##############################################FRANCE DELAY###############
+lastCountFR<-max(long[which(long$country =="France"),][3]) %>% as.numeric
+dayFR<-nrow(long[which(long$country =="France"),]) %>% as.numeric
 
 # find nearest value for italy
 ITcounts<-long[which(long$country =="Italy"),][3]
 lower<-ITcounts[sum(ITcounts <=lastCountFR),]
-higher<-ITcounts[min(which(ITcounts>lastCountFR)),]
+higher<-ITcounts[min(which(ITcounts>lastCountFR)),] %>% as.numeric
 
 if (abs(lower-lastCountFR)>abs(higher-lastCountFR)){
-  eqDayIT<-long[which(long$country =="Italy" & long$count == higher),][2]
+  eqDayITFR<-long[which(long$country =="Italy" & long$count == higher),][2] %>% as.numeric
 }else{
-  eqDayIT<-long[which(long$country =="Italy" & long$count == lower),][2]
+  eqDayITFR<-long[which(long$country =="Italy" & long$count == lower),][2] %>% as.numeric
 }
 
 
-xlab<-mean(predictdf$day)/2
-ylabFrance<-max(long[which(long$country == "France"),][3]) /10
+xlab<-mean(predictdf$day)*2/3
+ylabFrance<-max(predictdf[which(predictdf$country == "France"),][1]) /20
+###############################################################
 
+##############################################UK DELAY###############
+lastCountUK<-max(long[which(long$country =="United Kingdom"),][3]) %>% as.numeric
+dayUK<-nrow(long[which(long$country =="United Kingdom"),]) %>% as.numeric
+
+# find nearest value for italy
+ITcounts<-long[which(long$country =="Italy"),][3] 
+lower<-ITcounts[sum(ITcounts <=lastCountUK),] %>% as.numeric
+higher<-ITcounts[min(which(ITcounts>lastCountUK)),] %>% as.numeric
+
+if (abs(lower-lastCountUK)>abs(higher-lastCountUK)){
+  eqDayITUK<-long[which(long$country =="Italy" & long$count == higher),][2] %>% as.numeric
+}else{
+  eqDayITUK<-long[which(long$country =="Italy" & long$count == lower),][2] %>% as.numeric
+}
+
+xlab<-mean(predictdf$day)*2/3
+ylabUK<-max(predictdf[which(predictdf$country == "United Kingdom"),][1]) /20
+###############################################################
 
 
 png("images/Rplot06.png", width = 600, height = 600, units = "px")
@@ -192,9 +217,10 @@ png("images/Rplot06.png", width = 600, height = 600, units = "px")
 ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-  #scale_y_continuous(breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  #scale_y_continuous(breaks = round(seq(0, max(long$count), len = 10),1))+ # breaks for linear y scale
   #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-  annotate("text", hjust =0, x = xlab, y = ylabFrance, label = paste("France is", (eqDayIT - dayFR),"days behind Italy"))+
+  annotate("text", hjust =0, x = xlab, y = ylabFrance, label = paste("France is", (dayFR - eqDayITFR),"days behind Italy"))+
+  annotate("text", hjust =0, x = xlab, y = ylabUK, label = paste("UK is", (dayUK - eqDayITUK),"days behind Italy"))+
   labs( title = "Cov-19 growth by country (dots) and extrapolation (line)",
         subtitle = "(log scale) Plot assumes all started the same day",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
