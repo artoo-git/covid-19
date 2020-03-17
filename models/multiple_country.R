@@ -217,7 +217,7 @@ ITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),
 
 #UKlockdwn
 
-png("images/Rplot06.png", width = 600, height = 600, units = "px")
+png("images/Rplot06.png", width = 800, height = 800, units = "px")
 
 ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
