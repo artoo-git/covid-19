@@ -212,8 +212,10 @@ if (abs(lower-lastCountUK)>abs(higher-lastCountUK)){
 }
 
 xlab<-0
-ylabUK<-ylabFrance-15000
+ylabUK<-ylabFrance-12000
 ###############################################################
+lastCountIT<-max(long[which(long$country =="Italy"),][3]) %>% as.numeric
+dayIT<-max(long[which(long$country =="Italy"),][2]) %>% as.numeric
 
 xFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][4] %>% as.numeric
 yFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][1] %>% as.numeric
@@ -222,6 +224,8 @@ xITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy")
 yITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][1] %>% as.numeric
 
 ITinflex<- predictdf[which(predictdf$absDay==54 & predictdf$country == "Italy"),][1] %>% as.numeric
+ITinflexDay<- predictdf[which(predictdf$absDay==54 & predictdf$country == "Italy"),][4] %>% as.numeric
+
 #UKlockdwn
 
 png("images/Rplot06.png", width = 800, height = 800, units = "px")
@@ -231,20 +235,24 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_line(size = 1)+
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),65)+ 
+  xlim(min(predictdf$absDay),60)+ 
   #scale_y_continuous(breaks = round(seq(0, max(long$count), len = 10),1))+ # breaks for linear y scale
   #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
   geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 4,size = .1)+
   geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 4,size = .1)+
   geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=yFRlockdwn), color = "black", linetype = 4,size = .1)+
   geom_segment(mapping=aes(x=xFRlockdwn, xend=Inf,y=yFRlockdwn,yend=yFRlockdwn), color = "black", linetype = 4,size = .1)+
+  annotate("text", hjust= 1, x=60, y= yFRlockdwn, size=3, vjust=-0.4, label=yFRlockdwn) +
+  annotate("text", hjust= 1, x=60, y= yITlockdwn, size=3, vjust=-0.4, label=yITlockdwn) +
   
-  annotate("rect", xmin=50, xmax=Inf, ymin=ITinflex, ymax=Inf, alpha = .1)+
-  annotate("text", hjust =0, x=50, y= ITinflex, size=4, label= paste("Italy's inflection point*"))+
-  annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (54 - eqDayITFR),"days behind Italy infl. pt"))+
-  annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (54 - eqDayITUK),"days behind Italy infl pt"))+
+  geom_segment(mapping=aes(x=min(predictdf$absDay), xend=ITinflexDay, y=ITinflex, yend=ITinflex),linetype = 3)+
+  annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste(ITinflex," maybe Italy's inflection point*"))+
+  
+  #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (54 - eqDayITFR),"days behind Italy infl. pt"))+
+  #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (54 - eqDayITUK),"days behind Italy infl. pt"))+
   annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, label=lastCountFR)+
   annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, label=lastCountUK)+
+  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, label=lastCountIT)+
   annotate("text", hjust= 0, x=54, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown") +
   annotate("text", hjust= 0, x=42, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown") +
   guides(colour = "legend", linetype = "none")+
