@@ -22,8 +22,8 @@ library(gridExtra)
 ####################
           
 
-data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
-#data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
+#data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
 
 data<-data %>% select(1:2,5:ncol(data))
 #subset<-data[which(data$Country.Region == country),]
@@ -245,8 +245,9 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   annotate("text", hjust= 1, x=60, y= yFRlockdwn, size=3, vjust=-0.4, label=yFRlockdwn) +
   annotate("text", hjust= 1, x=60, y= yITlockdwn, size=3, vjust=-0.4, label=yITlockdwn) +
   
-  geom_segment(mapping=aes(x=min(predictdf$absDay), xend=ITinflexDay, y=ITinflex, yend=ITinflex),linetype = 3)+
-  annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste(ITinflex," Italy growth is approching 1 *"))+
+  #geom_segment(mapping=aes(x=min(predictdf$absDay), xend=ITinflexDay, y=ITinflex, yend=ITinflex),linetype = 3)+
+  #annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste(ITinflex," Italy growth is approaching 1 *"))+
+  annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste("UK is 14 days behind Italy and 6 behind France"))+
   
   #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (54 - eqDayITFR),"days behind Italy infl. pt"))+
   #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (54 - eqDayITUK),"days behind Italy infl. pt"))+
