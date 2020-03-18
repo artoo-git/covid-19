@@ -10,7 +10,8 @@ These are definetly far from perfect and I would not trust myself with the resul
 basic reference to non linear logistic models in R can be found at [datascienceplus](https://datascienceplus.com/first-steps-with-non-linear-regression-in-r/) and at [bscheng - modeling-logistic-growth-data](https://bscheng.com/2014/05/07/modeling-logistic-growth-data-in-r/).
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
-* Italy's growth factor *G* which can be expressed as: 
+
+\* This is speculative: I suppose this value (* starred) may identify with the inflection point for Italy. In this logistic curve, the growth factor *G* can be expressed as: 
 
 ![alt text](http://www.sciweavers.org/upload/Tex2Img_1584561993/render.png)
 
