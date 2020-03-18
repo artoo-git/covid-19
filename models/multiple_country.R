@@ -99,11 +99,12 @@ sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
 png("images/daycount.png", width = 800, height = 800, units = "px")
   ggplot(data = long, aes(x=day, y=daily, colour=country)) +
-    geom_point() +
-    geom_smooth(data = long, aes(x=day, y=daily, colour = country))+
+    #geom_point() +
+    #geom_line(data = long, aes(x=day, y=daily, colour = country))+
+    stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 10), se = FALSE)+
   #  geom_smooth(aes(colour = country))+#, family = poisson(link = "log"))+
-    ggtitle(paste("Everyday count of new cases as per: ", sysdate))
-dev.off
+    ggtitle(paste("Count of daily new cases (per day increase) as per: ", sysdate))
+dev.off()
 #############################################
 ####################
 #################### Total count plot: It should present with a good fir with a non linear logistic model
