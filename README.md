@@ -12,11 +12,7 @@ basic reference to non linear logistic models in R can be found at [datasciencep
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
 * Italy's growth factor *G* which can be expressed as: 
 
-  Delta N   
-         d  
-------------
-Delta N     
-       d - 1
+![alt text](http://www.sciweavers.org/upload/Tex2Img_1584561993/render.png)
 
 e.g the number of new cases today divided by the number of new cases yesterday. Between 15th of march and the 18th this growth factor has beeb around ~1: This *may* indicate that Italy has approached the inflection point after ~ 23 days of near exponential growth ( G ~ 1.3).
 
