@@ -5,7 +5,7 @@ Data source is the [Johns Hopkins University](https://github.com/CSSEGISandData/
 
 Just two snippets to plot models and prediction on the covid-19 outbreak data
 
-These are definitely far from perfect and I would not trust myself with the results so please use with caution. This is code that is meant to be used to learn about logistic regression.
+These are definitely far from perfect and I would not use these for any official report so please use with caution. This code was written as hobby and as an opportunity to learn more about non-linear logistic regression.
 
 basic reference to non linear logistic models in R can be found at [datascienceplus](https://datascienceplus.com/first-steps-with-non-linear-regression-in-r/) and at [bscheng - modeling-logistic-growth-data](https://bscheng.com/2014/05/07/modeling-logistic-growth-data-in-r/).
 
