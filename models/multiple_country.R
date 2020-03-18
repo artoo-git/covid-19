@@ -121,7 +121,7 @@ long$day<-as.numeric(long$day)
 #find the parameters for the equation
 
  predictdf<-data.frame() # this df is to rbind extrapolated values and counts for ggplot
-# 
+# c<-"France"
  for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
 #   
    subs<-long[which(long$country == c),]
@@ -176,7 +176,7 @@ sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
 ##############################################FRANCE DELAY###############
 lastCountFR<-max(long[which(long$country =="France"),][3]) %>% as.numeric
-dayFR<-nrow(long[which(long$country =="France"),]) %>% as.numeric
+dayFR<-max(long[which(long$country =="France"),][2]) %>% as.numeric
 reladayFR<-predictdf[which(predictdf$absDay== dayFR & predictdf$country == "France"),][2] %>% as.numeric()# this is for the position of the label count
 
 
@@ -199,7 +199,7 @@ ylabFrance<-max(predictdf[which(predictdf$country  == "Italy"),][1])
 
 ##############################################UK DELAY###############
 lastCountUK<-max(long[which(long$country =="United Kingdom"),][3]) %>% as.numeric
-dayUK<-nrow(long[which(long$country =="United Kingdom"),]) %>% as.numeric
+dayUK<-max(long[which(long$country =="United Kingdom"),][2]) %>% as.numeric
 reladayUK<-predictdf[which(predictdf$absDay== dayUK & predictdf$country == "United Kingdom"),][2] %>% as.numeric()# this is for the position of the label count
 
 # find nearest value for italy
@@ -214,7 +214,7 @@ if (abs(lower-lastCountUK)>abs(higher-lastCountUK)){
 }
 
 xlab<-0
-ylabUK<-max(predictdf[which(predictdf$country == "Italy"),][1])-10000
+ylabUK<-ylabFrance-15000
 ###############################################################
 
 FRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][2] %>% as.numeric
@@ -224,20 +224,24 @@ ITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),
 
 png("images/Rplot06.png", width = 800, height = 800, units = "px")
 
-ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
+ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
   geom_line(size = 1)+
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
+  xlim(min(predictdf$absDay),60)+ 
+  geom_segment(mapping=aes(x=dayFR, xend=eqDayITFR,y=lastCountFR,yend=lastCountFR), color = "black", linetype = 4,size = .1)+
+  geom_segment(mapping=aes(x=dayUK, xend=eqDayITUK,y=lastCountUK,yend=lastCountUK), color = "black", linetype = 4,size = .1)+
   #scale_y_continuous(breaks = round(seq(0, max(long$count), len = 10),1))+ # breaks for linear y scale
   #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-  geom_vline(aes(xintercept=FRlockdwn), linetype = "dotted")+
-  geom_vline(aes(xintercept=ITlockdwn), linetype = "dotted")+
-  annotate("text", hjust =0, x= xlab,     y= ylabFrance, size=5, label = paste("France is", (dayFR - eqDayITFR),"days behind Italy"))+
-  annotate("text", hjust =0, x= xlab,     y= ylabUK, label = paste("UK is", (dayUK - eqDayITUK),"days behind Italy"))+
-  annotate("text", hjust =0, x=reladayFR, y= lastCountFR, size=5, label=lastCountFR)+
-  annotate("text", hjust =0, x=reladayUK, y= lastCountUK, size=5, label=lastCountUK)+
-  annotate("text", hjust= 0, x=FRlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown") +
-  annotate("text", hjust= 0, x=ITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown") +
+  geom_vline(aes(xintercept=54), linetype = "dotted")+
+  geom_vline(aes(xintercept=42), linetype = "dotted")+
+  annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (dayFR - eqDayITFR),"days behind Italy"))+
+  annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (dayUK - eqDayITUK),"days behind Italy"))+
+  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, label=lastCountFR)+
+  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, label=lastCountUK)+
+  annotate("text", hjust= 0, x=54, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown") +
+  annotate("text", hjust= 0, x=42, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown") +
   guides(colour = "legend", linetype = "none")+
   labs( title = "Cov-19: count of total cases registred by country (dots)",
         subtitle = "(log scale) Plot assumes all started the same day",
