@@ -10,6 +10,13 @@ These are definetly far from perfect and I would not trust myself with the resul
 basic reference to non linear logistic models in R can be found at [datascienceplus](https://datascienceplus.com/first-steps-with-non-linear-regression-in-r/) and at [bscheng - modeling-logistic-growth-data](https://bscheng.com/2014/05/07/modeling-logistic-growth-data-in-r/).
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
+* Italy's growth factor can be expressed as: 
+
+$$\frac{NewCasesToday}{NewCasesYesterday}$$ 
+
+This value has been close to 1 between 15th of march and the 18th. This may indicate that italy has approached the inflection point.
+
+
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITmodel.png)
 

@@ -177,7 +177,6 @@ sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 ##############################################FRANCE DELAY###############
 lastCountFR<-max(long[which(long$country =="France"),][3]) %>% as.numeric
 dayFR<-max(long[which(long$country =="France"),][2]) %>% as.numeric
-reladayFR<-predictdf[which(predictdf$absDay== dayFR & predictdf$country == "France"),][2] %>% as.numeric()# this is for the position of the label count
 
 
 # find nearest value for italy
@@ -200,7 +199,6 @@ ylabFrance<-max(predictdf[which(predictdf$country  == "Italy"),][1])
 ##############################################UK DELAY###############
 lastCountUK<-max(long[which(long$country =="United Kingdom"),][3]) %>% as.numeric
 dayUK<-max(long[which(long$country =="United Kingdom"),][2]) %>% as.numeric
-reladayUK<-predictdf[which(predictdf$absDay== dayUK & predictdf$country == "United Kingdom"),][2] %>% as.numeric()# this is for the position of the label count
 
 # find nearest value for italy
 ITcounts<-long[which(long$country =="Italy"),][3] 
@@ -217,9 +215,13 @@ xlab<-0
 ylabUK<-ylabFrance-15000
 ###############################################################
 
-FRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][2] %>% as.numeric
-ITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][2] %>% as.numeric
+xFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][4] %>% as.numeric
+yFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][1] %>% as.numeric
 
+xITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][4] %>% as.numeric
+yITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][1] %>% as.numeric
+
+ITinflex<- predictdf[which(predictdf$absDay==54 & predictdf$country == "Italy"),][1] %>% as.numeric
 #UKlockdwn
 
 png("images/Rplot06.png", width = 800, height = 800, units = "px")
@@ -229,15 +231,18 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_line(size = 1)+
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),60)+ 
-  geom_segment(mapping=aes(x=dayFR, xend=eqDayITFR,y=lastCountFR,yend=lastCountFR), color = "black", linetype = 4,size = .1)+
-  geom_segment(mapping=aes(x=dayUK, xend=eqDayITUK,y=lastCountUK,yend=lastCountUK), color = "black", linetype = 4,size = .1)+
+  xlim(min(predictdf$absDay),65)+ 
   #scale_y_continuous(breaks = round(seq(0, max(long$count), len = 10),1))+ # breaks for linear y scale
   #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-  geom_vline(aes(xintercept=54), linetype = "dotted")+
-  geom_vline(aes(xintercept=42), linetype = "dotted")+
-  annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (dayFR - eqDayITFR),"days behind Italy"))+
-  annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (dayUK - eqDayITUK),"days behind Italy"))+
+  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 4,size = .1)+
+  geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 4,size = .1)+
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=yFRlockdwn), color = "black", linetype = 4,size = .1)+
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=Inf,y=yFRlockdwn,yend=yFRlockdwn), color = "black", linetype = 4,size = .1)+
+  
+  annotate("rect", xmin=50, xmax=Inf, ymin=ITinflex, ymax=Inf, alpha = .1)+
+  annotate("text", hjust =0, x=50, y= ITinflex, size=4, label= paste("Italy's inflection point*"))+
+  annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (54 - eqDayITFR),"days behind Italy infl. pt"))+
+  annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (54 - eqDayITUK),"days behind Italy infl pt"))+
   annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, label=lastCountFR)+
   annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, label=lastCountUK)+
   annotate("text", hjust= 0, x=54, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown") +
@@ -245,7 +250,8 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   guides(colour = "legend", linetype = "none")+
   labs( title = "Cov-19: count of total cases registred by country (dots)",
         subtitle = "(log scale) dotted line shows lockdown dates",
-        caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
+        caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
+        )
 
 
 dev.off()
