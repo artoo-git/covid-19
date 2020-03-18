@@ -97,12 +97,13 @@ while (i <= nrow(long)){
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
-ggplot(data = long, aes(x=day, y=daily, colour=country)) +
-  geom_point() +
-  geom_line(data = long, aes(x=day, y=daily, colour = country))+
-#  geom_smooth(aes(colour = country))+#, family = poisson(link = "log"))+
-  ggtitle(paste("Everyday count of new cases as per: ", sysdate))
-
+png("images/daycount.png", width = 800, height = 800, units = "px")
+  ggplot(data = long, aes(x=day, y=daily, colour=country)) +
+    geom_point() +
+    geom_smooth(data = long, aes(x=day, y=daily, colour = country))+
+  #  geom_smooth(aes(colour = country))+#, family = poisson(link = "log"))+
+    ggtitle(paste("Everyday count of new cases as per: ", sysdate))
+dev.off
 #############################################
 ####################
 #################### Total count plot: It should present with a good fir with a non linear logistic model
@@ -175,6 +176,8 @@ sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 ##############################################FRANCE DELAY###############
 lastCountFR<-max(long[which(long$country =="France"),][3]) %>% as.numeric
 dayFR<-nrow(long[which(long$country =="France"),]) %>% as.numeric
+reladayFR<-predictdf[which(predictdf$absDay== dayFR & predictdf$country == "France"),][2] %>% as.numeric()# this is for the position of the label count
+
 
 # find nearest value for italy
 ITcounts<-long[which(long$country =="Italy"),][3]
@@ -196,6 +199,7 @@ ylabFrance<-max(predictdf[which(predictdf$country  == "Italy"),][1])
 ##############################################UK DELAY###############
 lastCountUK<-max(long[which(long$country =="United Kingdom"),][3]) %>% as.numeric
 dayUK<-nrow(long[which(long$country =="United Kingdom"),]) %>% as.numeric
+reladayUK<-predictdf[which(predictdf$absDay== dayUK & predictdf$country == "United Kingdom"),][2] %>% as.numeric()# this is for the position of the label count
 
 # find nearest value for italy
 ITcounts<-long[which(long$country =="Italy"),][3] 
@@ -221,21 +225,22 @@ png("images/Rplot06.png", width = 800, height = 800, units = "px")
 
 ggplot(data = predictdf, aes(x=day, y=count, colour=country)) +
   geom_point() +
-  geom_line()+
+  geom_line(size = 1)+
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   #scale_y_continuous(breaks = round(seq(0, max(long$count), len = 10),1))+ # breaks for linear y scale
   #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-  annotate("text", hjust =0, x = xlab, y = ylabFrance, label = paste("France is", (dayFR - eqDayITFR),"days behind Italy"))+
-  annotate("text", hjust =0, x = xlab, y = ylabUK, label = paste("UK is", (dayUK - eqDayITUK),"days behind Italy"))+
   geom_vline(aes(xintercept=FRlockdwn), linetype = "dotted")+
   geom_vline(aes(xintercept=ITlockdwn), linetype = "dotted")+
-  geom_text(aes(x=FRlockdwn, y=0, label="FR lockdown"), size=4, angle=90, vjust=-0.4, hjust=0) +
-  geom_text(aes(x=ITlockdwn, y=0, label="IT lockdown"), size=4, angle=90, vjust=-0.4, hjust=0) +
+  annotate("text", hjust =0, x= xlab,     y= ylabFrance, size=5, label = paste("France is", (dayFR - eqDayITFR),"days behind Italy"))+
+  annotate("text", hjust =0, x= xlab,     y= ylabUK, label = paste("UK is", (dayUK - eqDayITUK),"days behind Italy"))+
+  annotate("text", hjust =0, x=reladayFR, y= lastCountFR, size=5, label=lastCountFR)+
+  annotate("text", hjust =0, x=reladayUK, y= lastCountUK, size=5, label=lastCountUK)+
+  annotate("text", hjust= 0, x=FRlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown") +
+  annotate("text", hjust= 0, x=ITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown") +
   guides(colour = "legend", linetype = "none")+
-  labs( title = "Cov-19 growth by country (dots)",
+  labs( title = "Cov-19: count of total cases registred by country (dots)",
         subtitle = "(log scale) Plot assumes all started the same day",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
 
-#grid.arrange(plot1, plot2, ncol=2)
 
 dev.off()
