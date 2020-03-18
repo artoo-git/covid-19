@@ -22,9 +22,9 @@ country = c("Italy")
 ####################
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
-#link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv"
-link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
-data<-read.csv(file = link,header = TRUE,sep = ",")
+data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+#link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
+#data<-read.csv(file = link,header = TRUE,sep = ",")
 
 #data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
 

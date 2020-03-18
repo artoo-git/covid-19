@@ -21,6 +21,9 @@ e.g the number of new cases today divided by the number of new cases yesterday. 
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITmodel.png)
 
+
+ALL plateau histograms are projections at 3 weeks and are based on relatively little data and very (VERY) likely to change. Data projection at 5 days (like the above) are more likely to be accurate.
+
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITplateau.png)
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITmodelD.png)
