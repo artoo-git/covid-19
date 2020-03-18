@@ -92,14 +92,14 @@ n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 
 png("images/ITplateau.png", width = 600, height = 600, units = "px")
-hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
-abline(v=bootL$estiboot[1,1], col = "blue")
-text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
+  hist(bootL$coefboot[,1], xlab = "Prediction of tot detected cases at plateau", breaks = 200, main = paste("ITALY: Boostrap extrapolation of total count at plateau (", sysdate, ")"))
+  abline(v=bootL$estiboot[1,1], col = "blue")
+  text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
 dev.off()
 
 n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
-hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for Italy")
+hist(bootL$coefboot[,1], breaks = 200)
 
 x<-1:(nrow(subs)+5)
 Param_Boo<-bootL$coefboot
@@ -110,25 +110,26 @@ for(i in 1:n.Iter){
     curveDF[j+(i-1)*n.Iter,1] <- Param_Boo[i,1]/(1+exp(-(Param_Boo[i,2]+Param_Boo[i,3]*x[j])))
     # Bootstrap sample number
     curveDF[j+(i-1)*n.Iter,2] <- i
-    # x value
+  # x value
     curveDF[j+(i-1)*n.Iter,3] <- x[j]
   }
 }
 colnames(curveDF) <- c('count','bsP','day')
 
-span<-1:(nrow(subs)+5)
+daysAhead<-5
+span<-1:(nrow(subs)+daysAhead)
 pred<-round(max(predict(m, newdata = data.frame(day=span),1)))
 lowbound<-min(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 highbound<-max(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 
-png("images/ITmodel.png", width = 600, height = 600, units = "px")
+png("images/ITmodel_1803.png", width = 600, height = 600, units = "px")
 ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
   geom_line(color="blue") +
   geom_vline(xintercept = max(subs$day),linetype = "dashed")+
   annotate("text", hjust = 1, x = max(subs$day), y = max(subs$count), label = paste(max(subs$count), ". Count as per", sysdate))+
-  annotate("text", hjust = 1, x = max(span), y = pred, label = paste(pred, "estimated in 5 days"))+
+  annotate("text", hjust = 1, x = max(span), y = pred, label = paste(pred, "estimated in ", daysAhead, "days"))+
   annotate("text", hjust = 1, x = max(span), y = lowbound, label = lowbound)+
   annotate("text", hjust = 1, x = max(span), y = highbound, label = highbound)+
-  ggtitle(paste("Projection of Total counts of cases 5 days for Italy as per",sysdate))
+  ggtitle(paste("Projection and bootstrap CI of total counts of cases in", daysAhead," from ", sysdate))
 dev.off()
-predict(m, data = data.frame(25))
+
