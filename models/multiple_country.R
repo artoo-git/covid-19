@@ -223,8 +223,8 @@ yFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"
 xITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][4] %>% as.numeric
 yITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][1] %>% as.numeric
 
-ITinflex<- predictdf[which(predictdf$absDay==54 & predictdf$country == "Italy"),][1] %>% as.numeric
-ITinflexDay<- predictdf[which(predictdf$absDay==54 & predictdf$country == "Italy"),][4] %>% as.numeric
+ITinflex<- predictdf[which(predictdf$absDay==55 & predictdf$country == "Italy"),][1] %>% as.numeric
+ITinflexDay<- predictdf[which(predictdf$absDay==55 & predictdf$country == "Italy"),][4] %>% as.numeric
 
 #UKlockdwn
 
@@ -246,7 +246,7 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   annotate("text", hjust= 1, x=60, y= yITlockdwn, size=3, vjust=-0.4, label=yITlockdwn) +
   
   geom_segment(mapping=aes(x=min(predictdf$absDay), xend=ITinflexDay, y=ITinflex, yend=ITinflex),linetype = 3)+
-  annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste(ITinflex," maybe Italy's inflection point*"))+
+  annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste(ITinflex," Italy growth is approching 1 *"))+
   
   #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (54 - eqDayITFR),"days behind Italy infl. pt"))+
   #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (54 - eqDayITUK),"days behind Italy infl. pt"))+

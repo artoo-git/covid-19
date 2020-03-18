@@ -11,11 +11,11 @@ basic reference to non linear logistic models in R can be found at [datasciencep
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
 
-\* This is speculative: I suppose this value (* starred) may identify with the inflection point for Italy. In this logistic curve, the growth factor *G* can be expressed as: 
+\* In this logistic curve, the growth factor *G* can be expressed as: 
 
 ![alt text](http://www.sciweavers.org/upload/Tex2Img_1584561993/render.png)
 
-e.g the number of new cases today divided by the number of new cases yesterday. Between 15th of march and the 18th this growth factor has beeb around ~1: This *may* indicate that Italy has approached the inflection point after ~ 23 days of near exponential growth ( G ~ 1.3).
+e.g the number of new cases today divided by the number of new cases yesterday. Between 15th of march and the 18th this growth factor has beeb around ~1: This *may* indicate that Italy is approaching the inflection point in the next few days after an intial 23 days of exponential growth ( G ~ 1.3).
 
 
 
