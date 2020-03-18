@@ -92,7 +92,7 @@ n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 
 png("images/ITplateau.png", width = 600, height = 600, units = "px")
-  hist(bootL$coefboot[,1], xlab = "Prediction of tot detected cases at plateau", breaks = 200, main = paste("ITALY: Boostrap extrapolation of total count at plateau (", sysdate, ")"))
+  hist(bootL$coefboot[,1], xlab = "Prediction of tot detected cases at plateau", breaks = 200, main = paste("ITALY: Bootstrap extrapolation of total count at plateau (", sysdate, ")"))
   abline(v=bootL$estiboot[1,1], col = "blue")
   text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
 dev.off()
