@@ -220,8 +220,8 @@ dayIT<-max(long[which(long$country =="Italy"),][2]) %>% as.numeric
 xFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][4] %>% as.numeric
 yFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][1] %>% as.numeric
 
-xITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][4] %>% as.numeric
-yITlockdwn<-predictdf[which(predictdf$absDay==42 & predictdf$country == "Italy"),][1] %>% as.numeric
+xITlockdwn<-predictdf[which(predictdf$absDay==47 & predictdf$country == "Italy"),][4] %>% as.numeric
+yITlockdwn<-predictdf[which(predictdf$absDay==47 & predictdf$country == "Italy"),][1] %>% as.numeric
 
 ITinflex<- predictdf[which(predictdf$absDay==55 & predictdf$country == "Italy"),][1] %>% as.numeric
 ITinflexDay<- predictdf[which(predictdf$absDay==55 & predictdf$country == "Italy"),][4] %>% as.numeric
@@ -250,9 +250,9 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   
   #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (54 - eqDayITFR),"days behind Italy infl. pt"))+
   #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (54 - eqDayITUK),"days behind Italy infl. pt"))+
-  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, label=lastCountFR)+
-  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, label=lastCountUK)+
-  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, label=lastCountIT)+
+  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.4,label=lastCountFR)+
+  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.4,label=lastCountUK)+
+  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.4,label=lastCountIT)+
   annotate("text", hjust= 0, x=54, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown") +
   annotate("text", hjust= 0, x=42, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown") +
   guides(colour = "legend", linetype = "none")+
