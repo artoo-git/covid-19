@@ -244,7 +244,7 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   annotate("text", hjust= 0, x=42, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown") +
   guides(colour = "legend", linetype = "none")+
   labs( title = "Cov-19: count of total cases registred by country (dots)",
-        subtitle = "(log scale) Plot assumes all started the same day",
+        subtitle = "(log scale) dotted line shows lockdown dates",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset"))
 
 
