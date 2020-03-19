@@ -98,12 +98,17 @@ while (i <= nrow(long)){
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
 png("images/daycount.png", width = 800, height = 800, units = "px")
-  ggplot(data = long, aes(x=day, y=daily, colour=country)) +
+  ggplot(data = long[which(long$day>30),], aes(x=day, y=daily, colour=country)) +
+    scale_y_continuous(trans = "log10")+#
     #geom_point() +
     #geom_line(data = long, aes(x=day, y=daily, colour = country))+
-    stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 10), se = FALSE)+
+    stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 9,raw =T), se = FALSE)+
   #  geom_smooth(aes(colour = country))+#, family = poisson(link = "log"))+
-    ggtitle(paste("Count of daily new cases (per day increase) as per: ", sysdate))
+    labs( title = paste("Polynomial approx. of daily new cases as per: ", sysdate),
+          subtitle = "Per-day increase, y is Log. (polynomial degree = 9)",
+          caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
+    )
+    
 dev.off()
 #############################################
 ####################
