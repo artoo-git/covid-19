@@ -17,13 +17,13 @@ library(gridExtra)
 
 #####################
 
-          country = c("Italy","France","United Kingdom")
+          country = c("Italy","France","United Kingdom","Spain","Germany")
 
 ####################
           
 
-#data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
-data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+#data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
 
 data<-data %>% select(1:2,5:ncol(data))
 #subset<-data[which(data$Country.Region == country),]
@@ -66,7 +66,7 @@ long[which(long$country=="France" & long$day==54),3]<-5423
 ####################
 #############################################
 #long[which(long$day==50|long$day==51),]
-colnames(long)<- c("country","day","total")
+#colnames(long)<- c("country","day","total")
 
 long$day<-as.numeric(long$day)
 
@@ -125,7 +125,7 @@ long$day<-as.numeric(long$day)
  for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
 #   
    subs<-long[which(long$country == c),]
-   outbr_day <- min(which(subs$count >13)) # set a minimum of 20 cases to facilitate convergence
+   outbr_day <- min(which(subs$count >16)) # set a minimum of 20 cases to facilitate convergence
    subs<-subs[which(subs$day >= outbr_day),] 
    subs$absDay<-subs$day
    subs$day<-1:nrow(subs)
@@ -174,89 +174,112 @@ long$day<-as.numeric(long$day)
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
-##############################################FRANCE DELAY###############
-lastCountFR<-max(long[which(long$country =="France"),][3]) %>% as.numeric
-dayFR<-max(long[which(long$country =="France"),][2]) %>% as.numeric
 
 
-# find nearest value for italy
-ITcounts<-long[which(long$country =="Italy"),][3]
-lower<-ITcounts[sum(ITcounts <=lastCountFR),]
-higher<-ITcounts[min(which(ITcounts>lastCountFR)),] %>% as.numeric
-
-if (abs(lower-lastCountFR)>abs(higher-lastCountFR)){
-  eqDayITFR<-long[which(long$country =="Italy" & long$count == higher),][2] %>% as.numeric
-}else{
-  eqDayITFR<-long[which(long$country =="Italy" & long$count == lower),][2] %>% as.numeric
-}
-
-
-xlab<-0
-ylabFrance<-max(predictdf[which(predictdf$country  == "Italy"),][1])
+###############################################FRANCE DELAY###############
+# 
+# # find nearest value for italy
+# ITcounts<-long[which(long$country =="Italy"),][3]
+# lower<-ITcounts[sum(ITcounts <=lastCountFR),]
+# higher<-ITcounts[min(which(ITcounts>lastCountFR)),] %>% as.numeric
+# 
+# if (abs(lower-lastCountFR)>abs(higher-lastCountFR)){
+#   eqDayITFR<-long[which(long$country =="Italy" & long$count == higher),][2] %>% as.numeric
+# }else{
+#   eqDayITFR<-long[which(long$country =="Italy" & long$count == lower),][2] %>% as.numeric
+# }
+# 
+# 
+# xlab<-0
+# ylabFrance<-max(predictdf[which(predictdf$country  == "Italy"),][1])
 
 ###############################################################
 
 ##############################################UK DELAY###############
+# # find nearest value for italy
+# ITcounts<-long[which(long$country =="Italy"),][3] 
+# lower<-ITcounts[sum(ITcounts <=lastCountUK),] %>% as.numeric
+# higher<-ITcounts[min(which(ITcounts>lastCountUK)),] %>% as.numeric
+# 
+# if (abs(lower-lastCountUK)>abs(higher-lastCountUK)){
+#   eqDayITUK<-long[which(long$country =="Italy" & long$count == higher),][2] %>% as.numeric
+# }else{
+#   eqDayITUK<-long[which(long$country =="Italy" & long$count == lower),][2] %>% as.numeric
+# }
+# 
+# xlab<-0
+# ylabUK<-ylabFrance-12000
+###############################################################
+lastCountFR<-max(long[which(long$country =="France"),][3]) %>% as.numeric
+dayFR<-max(long[which(long$country =="France"),][2]) %>% as.numeric
+
 lastCountUK<-max(long[which(long$country =="United Kingdom"),][3]) %>% as.numeric
 dayUK<-max(long[which(long$country =="United Kingdom"),][2]) %>% as.numeric
 
-# find nearest value for italy
-ITcounts<-long[which(long$country =="Italy"),][3] 
-lower<-ITcounts[sum(ITcounts <=lastCountUK),] %>% as.numeric
-higher<-ITcounts[min(which(ITcounts>lastCountUK)),] %>% as.numeric
-
-if (abs(lower-lastCountUK)>abs(higher-lastCountUK)){
-  eqDayITUK<-long[which(long$country =="Italy" & long$count == higher),][2] %>% as.numeric
-}else{
-  eqDayITUK<-long[which(long$country =="Italy" & long$count == lower),][2] %>% as.numeric
-}
-
-xlab<-0
-ylabUK<-ylabFrance-12000
-###############################################################
 lastCountIT<-max(long[which(long$country =="Italy"),][3]) %>% as.numeric
 dayIT<-max(long[which(long$country =="Italy"),][2]) %>% as.numeric
 
+lastCountES<-max(long[which(long$country =="Spain"),][3]) %>% as.numeric
+dayES<-max(long[which(long$country =="Spain"),][2]) %>% as.numeric
+
+lastCountDE<-max(long[which(long$country =="Germany"),][3]) %>% as.numeric
+dayDE<-max(long[which(long$country =="Germany"),][2]) %>% as.numeric
+################################################################
 xFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][4] %>% as.numeric
 yFRlockdwn<-predictdf[which(predictdf$absDay==54 & predictdf$country == "France"),][1] %>% as.numeric
 
 xITlockdwn<-predictdf[which(predictdf$absDay==47 & predictdf$country == "Italy"),][4] %>% as.numeric
 yITlockdwn<-predictdf[which(predictdf$absDay==47 & predictdf$country == "Italy"),][1] %>% as.numeric
 
-ITinflex<- predictdf[which(predictdf$absDay==55 & predictdf$country == "Italy"),][1] %>% as.numeric
-ITinflexDay<- predictdf[which(predictdf$absDay==55 & predictdf$country == "Italy"),][4] %>% as.numeric
+xESlockdwn<-predictdf[which(predictdf$absDay==52 & predictdf$country == "Spain"),][4] %>% as.numeric
+yESlockdwn<-predictdf[which(predictdf$absDay==52 & predictdf$country == "Spain"),][1] %>% as.numeric
 
 #UKlockdwn
+
+
+###################
+
+
 
 png("images/Rplot06.png", width = 800, height = 800, units = "px")
 
 ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
-  geom_line(size = 1)+
-  scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
-  scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),60)+ 
-  #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
-  #geom_line(data = predictdf, aes(x=day, y=predict, colour = country))+
-  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 4,size = .1)+
-  geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 4,size = .1)+
-  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=yFRlockdwn), color = "black", linetype = 4,size = .1)+
-  geom_segment(mapping=aes(x=xFRlockdwn, xend=Inf,y=yFRlockdwn,yend=yFRlockdwn), color = "black", linetype = 4,size = .1)+
-  annotate("text", hjust= 1, x=60, y= yFRlockdwn, size=3, vjust=-0.4, label=yFRlockdwn) +
-  annotate("text", hjust= 1, x=60, y= yITlockdwn, size=3, vjust=-0.4, label=yITlockdwn) +
+  #geom_line(size = 1)+
+  stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x, 10))+
   
-  #geom_segment(mapping=aes(x=min(predictdf$absDay), xend=ITinflexDay, y=ITinflex, yend=ITinflex),linetype = 3)+
-  #annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste(ITinflex," Italy growth is approaching 1 *"))+
+  scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
+  #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
+  xlim(min(predictdf$absDay),60)+ 
+  ####### lockdown segments
+  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
+  
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=yFRlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=Inf,y=yFRlockdwn,yend=yFRlockdwn), color = "black", linetype = 9,size = .1)+
+  
+  geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=0,yend=yESlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xESlockdwn, xend=Inf,y=yESlockdwn,yend=yESlockdwn), color = "black", linetype = 9,size = .1)+
+  ####### lockdown counts
+  annotate("text", hjust= -0.1, x=xFRlockdwn, y= yFRlockdwn, size=3, vjust=-0.4, label=yFRlockdwn) +
+  annotate("text", hjust= -0.1, x=xITlockdwn, y= yITlockdwn, size=3, vjust=-0.4, label=yITlockdwn) +
+  annotate("text", hjust= -0.1, x=xESlockdwn, y= yESlockdwn, size=3, vjust=-0.4, label=yESlockdwn) +
+  ####### last count labels
+  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.2,label=lastCountFR)+
+  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.2,label=lastCountUK)+
+  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.2,label=lastCountIT)+
+  annotate("text", hjust =0, x=dayES, y= lastCountES, size=4, vjust=-0.2,label=lastCountES)+
+  ######lockdown labels
+  annotate("text", hjust= 0, x=xITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown - 9 March") +
+  annotate("text", hjust= 0, x=xESlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Spain lockdown - 14 March") +
+  annotate("text", hjust= 0, x=xFRlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown - 16 March") +
+  #annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown") +
+  
+  guides(colour = "legend", linetype = "none")+
+  
   annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste("UK is 14 days behind Italy and 6 behind France"))+
   
-  #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabFrance, label = paste("France is", (54 - eqDayITFR),"days behind Italy infl. pt"))+
-  #annotate("text", hjust =0, x= min(predictdf$absDay), y= ylabUK, label = paste("UK is", (54 - eqDayITUK),"days behind Italy infl. pt"))+
-  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.4,label=lastCountFR)+
-  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.4,label=lastCountUK)+
-  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.4,label=lastCountIT)+
-  annotate("text", hjust= 0, x=54, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown") +
-  annotate("text", hjust= 0, x=42, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown") +
-  guides(colour = "legend", linetype = "none")+
   labs( title = "Cov-19: count of total cases registred by country (dots)",
         subtitle = "(log scale) dotted line shows lockdown dates",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
