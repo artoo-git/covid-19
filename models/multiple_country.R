@@ -44,7 +44,7 @@ names(subset) <- c("Country.Region",(1:(ncol(subset)-1)))
 
 
 long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
-colnames(long)<- c("country","day","total")
+colnames(long)<- c("country","day","count")
 
 #long<- long[which(long$value != 0),]# select all rows with zero counts for deletion
 
@@ -66,7 +66,7 @@ long[which(long$country=="France" & long$day==54),3]<-5423
 ####################
 #############################################
 #long[which(long$day==50|long$day==51),]
-#colnames(long)<- c("country","day","total")
+#colnames(long)<- c("country","day","count")
 
 long$day<-as.numeric(long$day)
 
@@ -76,14 +76,14 @@ i<-1
 # calculate  the difference in scores to model the daily increase and not the total count
 
 while (i <= nrow(long)){
-  total<-long$total[i]
+  count<-long$count[i]
   day<- long$day[i]
   cntr<-long$country[i]
-  if(total > 1 & day >1){
+  if(count > 1 & day >1){
     prev_tot<-long[which(long$country == cntr & long$day == (day-1)),][3]
-    long$daily[i]<-as.numeric(total - prev_tot)
+    long$daily[i]<-as.numeric(count - prev_tot)
   }else{
-    long$daily[i]<-as.numeric(long$total[i])
+    long$daily[i]<-as.numeric(long$count[i])
   }
   i<-i+1
 }
@@ -97,19 +97,8 @@ while (i <= nrow(long)){
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 
-png("images/daycount.png", width = 800, height = 800, units = "px")
-  ggplot(data = long[which(long$day>30),], aes(x=day, y=daily, colour=country)) +
-    scale_y_continuous(trans = "log10")+#
-    #geom_point() +
-    #geom_line(data = long, aes(x=day, y=daily, colour = country))+
-    stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 9,raw =T), se = FALSE)+
-  #  geom_smooth(aes(colour = country))+#, family = poisson(link = "log"))+
-    labs( title = paste("Polynomial approx. of daily new cases as per: ", sysdate),
-          subtitle = "Per-day increase, y is Log. (polynomial degree = 9)",
-          caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
-    )
-    
-dev.off()
+## plot moved to the tail of the script
+
 #############################################
 ####################
 #################### Total count plot: It should present with a good fir with a non linear logistic model
@@ -256,7 +245,12 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
   #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),60)+ 
+  xlim(min(predictdf$absDay),60)+
+  ####### last count labels
+  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.2,label=lastCountFR)+
+  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.2,label=lastCountUK)+
+  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.2,label=lastCountIT)+
+  annotate("text", hjust =0, x=dayES, y= lastCountES, size=4, vjust=-0.2,label=lastCountES)+
   ####### lockdown segments
   geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
@@ -270,11 +264,6 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   annotate("text", hjust= -0.1, x=xFRlockdwn, y= yFRlockdwn, size=3, vjust=-0.4, label=yFRlockdwn) +
   annotate("text", hjust= -0.1, x=xITlockdwn, y= yITlockdwn, size=3, vjust=-0.4, label=yITlockdwn) +
   annotate("text", hjust= -0.1, x=xESlockdwn, y= yESlockdwn, size=3, vjust=-0.4, label=yESlockdwn) +
-  ####### last count labels
-  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.2,label=lastCountFR)+
-  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.2,label=lastCountUK)+
-  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.2,label=lastCountIT)+
-  annotate("text", hjust =0, x=dayES, y= lastCountES, size=4, vjust=-0.2,label=lastCountES)+
   ######lockdown labels
   annotate("text", hjust= 0, x=xITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown - 9 March") +
   annotate("text", hjust= 0, x=xESlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Spain lockdown - 14 March") +
@@ -290,5 +279,47 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
         )
 
+
+dev.off()
+
+
+
+###
+## DAILY INCREASE PLOT
+################################################################
+ydFRlockdwn<-long[which(long$day==54 & long$country == "France"),][4] %>% as.numeric
+
+ydITlockdwn<-long[which(long$day==47 & long$country == "Italy"),][4] %>% as.numeric
+
+ydESlockdwn<-long[which(long$day==52 & long$country == "Spain"),][4] %>% as.numeric
+
+png("images/daycount.png", width = 800, height = 800, units = "px")
+ggplot(data = long[which(long$day>30),], aes(x=day, y=daily, colour=country)) +
+  scale_y_continuous(trans = "log10")+#
+  #geom_point() +
+  #geom_line(data = long, aes(x=day, y=daily, colour = country))+
+  stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 9,raw =T), se = FALSE)+
+  ####### lockdown segments
+  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=ydITlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=ydITlockdwn,yend=ydITlockdwn), color = "black", linetype = 9,size = .1)+
+
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=ydFRlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=Inf,y=ydFRlockdwn,yend=ydFRlockdwn), color = "black", linetype = 9,size = .1)+
+
+  geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=0,yend=ydESlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xESlockdwn, xend=Inf,y=ydESlockdwn,yend=ydESlockdwn), color = "black", linetype = 9,size = .1)+
+  ####### lockdown counts
+  annotate("text", hjust= -0.1, x=xFRlockdwn, y= ydFRlockdwn, size=3, vjust=-0.4, label=ydFRlockdwn) +
+  annotate("text", hjust= -0.1, x=xITlockdwn, y= ydITlockdwn, size=3, vjust=-0.4, label=ydITlockdwn) +
+  annotate("text", hjust= -0.1, x=xESlockdwn, y= ydESlockdwn, size=3, vjust=-0.4, label=ydESlockdwn) +
+  ######lockdown labels
+  annotate("text", hjust= 0, x=xITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown - 9 March") +
+  annotate("text", hjust= 0, x=xESlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Spain lockdown - 14 March") +
+  annotate("text", hjust= 0, x=xFRlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown - 16 March") +
+  #annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown") +
+  labs( title = paste("Polynomial approx. of daily new cases as per: ", sysdate),
+        subtitle = "Per-day increase, y is Log. (polynomial degree = 9)",
+        caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
+  )
 
 dev.off()
