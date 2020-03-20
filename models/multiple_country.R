@@ -55,8 +55,9 @@ long$country<-droplevels(long$country)
 long[which(long$country=="Italy" & long$day==51),3]<-15113          #
 long[which(long$country=="United Kingdom" & long$day==51),3]<-590   #
 long[which(long$country=="United Kingdom" & long$day==54),3]<-1393   #
+long[which(long$country=="United Kingdom" & long$day==58),3]<-3269   #
 long[which(long$country=="France" & long$day==51),3]<-2876  
-long[which(long$country=="France" & long$day==54),3]<-5423 
+long[which(long$country=="France" & long$day==54),3]<-5423
 #
 #####################################################################
 
@@ -240,7 +241,7 @@ png("images/Rplot06.png", width = 800, height = 800, units = "px")
 ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
   #geom_line(size = 1)+
-  stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x, 10))+
+  stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x, 6))+
   
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
@@ -251,6 +252,7 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.2,label=lastCountUK)+
   annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.2,label=lastCountIT)+
   annotate("text", hjust =0, x=dayES, y= lastCountES, size=4, vjust=-0.2,label=lastCountES)+
+  annotate("text", hjust =0, x=dayES, y= lastCountDE, size=4, vjust=-0.2,label=lastCountDE)+
   ####### lockdown segments
   geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
