@@ -11,23 +11,13 @@ basic reference to non linear logistic models in R can be found at [datasciencep
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
 
-\* In this logistic curve, the growth factor *G* can be expressed as: 
+In this logistic curve below (Projectio at 5 days), the growth factor *G* can be expressed as: 
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/render.png)
 
-e.g the number of new cases today divided by the number of new cases yesterday. Between 15th of March and the 18th this growth factor has been around ~1: This *may* indicate that Italy is approaching the inflection point in the next few days after an intial 23 days of exponential growth ( G ~ 1.3).
-
-
+e.g the number of new cases today divided by the number of new cases yesterday. Between 15th of March and the 21st this growth factor has been decreasing on average: This *may* indicate that Italy is approaching the inflection point. Because of the timings (incubation time, duration of disease) every measure will have a delayed effect of roughly two weeks. For comparison, the canonical exponential growth of covid is G ~ 1.3.
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITmodel.png)
-
-
-ALL plateau histograms are projections at 3 weeks and are based on relatively little data and very (VERY) likely to change. Data projection at 5 days (like the above) are more likely to be accurate.
-
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITplateau.png)
-
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITmodelD.png)
-
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/FRmodel.png)
 

@@ -22,7 +22,7 @@ country = c("France")
 ####################
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
-#link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Deaths.csv"
+#data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
 link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
 data<-read.csv(file = link,header = TRUE,sep = ",")
 
@@ -45,6 +45,7 @@ names(subset) <- c("Country.Region",paste("day.",(1:(ncol(subset)-1)),sep = ""))
 
 
 long <- melt(subset, time.var= subset(2:ncol(subset)),id.vars = c("Country.Region"))
+
 long[51,3] <-2876 # csv is wrong
 long[54,3] <-5423 # csv is wrong
 
@@ -92,14 +93,14 @@ n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 
 png("images/FRplateau.png", width = 600, height = 600, units = "px")
-hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for France")
+hist(bootL$coefboot[,1], xlab = paste("Prediction of tot detected cases at plateau -", sysdate), breaks = 200, main = paste("ITALY: Bootstrap extrapolation of total count at plateau (", sysdate, ")"))
 abline(v=bootL$estiboot[1,1], col = "blue")
 text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
 dev.off()
 
 n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
-hist(bootL$coefboot[,1], breaks = 200, main = "boostrap value of extrapolated value of plateau for France")
+hist(bootL$coefboot[,1], breaks = 200)
 
 x<-1:(nrow(subs)+5)
 Param_Boo<-bootL$coefboot
@@ -116,7 +117,8 @@ for(i in 1:n.Iter){
 }
 colnames(curveDF) <- c('count','bsP','day')
 
-span<-1:(nrow(subs)+5)
+daysAhead<-5
+span<-1:(nrow(subs)+daysAhead)
 pred<-round(max(predict(m, newdata = data.frame(day=span),1)))
 lowbound<-min(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 highbound<-max(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
@@ -126,9 +128,14 @@ ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
   geom_line(color="red") +
   geom_vline(xintercept = max(subs$day),linetype = "dashed")+
   annotate("text", hjust = 1, x = max(subs$day), y = max(subs$count), label = paste(max(subs$count), ". Count as per", sysdate))+
-  annotate("text", hjust = 1, x = max(span), y = pred, label = paste(pred, "estimated in 5 days"))+
+  annotate("text", hjust = 1, x = max(span), y = pred, label = paste(pred, "estimated in ", daysAhead, "days"))+
   annotate("text", hjust = 1, x = max(span), y = lowbound, label = lowbound)+
   annotate("text", hjust = 1, x = max(span), y = highbound, label = highbound)+
-  ggtitle(paste("Projection of Total counts of cases 5 days for France as per",sysdate))
+  labs( title = paste(country, "- 5 days projection of total counts of cases"),
+        subtitle = paste("Bootstrapped CI at 5 days from", sysdate),
+        caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
+  )
 dev.off()
-#predict(m, data = data.frame(24))
+
+predict(m, newdata = data.frame(day=1:58))
+

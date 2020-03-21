@@ -22,9 +22,9 @@ country = c("Italy")
 ####################
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
-data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
-#link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
-#data<-read.csv(file = link,header = TRUE,sep = ",")
+#data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
+data<-read.csv(file = link,header = TRUE,sep = ",")
 
 #data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
 
@@ -92,7 +92,7 @@ n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 
 png("images/ITplateau.png", width = 600, height = 600, units = "px")
-  hist(bootL$coefboot[,1], xlab = "Prediction of tot detected cases at plateau", breaks = 200, main = paste("ITALY: Bootstrap extrapolation of total count at plateau (", sysdate, ")"))
+  hist(bootL$coefboot[,1], xlab = paste("Prediction of tot detected cases at plateau -", sysdate), breaks = 200, main = paste("ITALY: Bootstrap extrapolation of total count at plateau (", sysdate, ")"))
   abline(v=bootL$estiboot[1,1], col = "blue")
   text(bootL$estiboot[1,1], -2, round(bootL$estiboot[1,1],1), srt=0.4, col = "blue")
 dev.off()
@@ -122,7 +122,7 @@ pred<-round(max(predict(m, newdata = data.frame(day=span),1)))
 lowbound<-min(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 highbound<-max(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 
-png("images/ITmodel_1803.png", width = 600, height = 600, units = "px")
+png("images/ITmodel.png", width = 600, height = 600, units = "px")
 ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
   geom_line(color="blue") +
   geom_vline(xintercept = max(subs$day),linetype = "dashed")+
@@ -130,6 +130,10 @@ ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
   annotate("text", hjust = 1, x = max(span), y = pred, label = paste(pred, "estimated in ", daysAhead, "days"))+
   annotate("text", hjust = 1, x = max(span), y = lowbound, label = lowbound)+
   annotate("text", hjust = 1, x = max(span), y = highbound, label = highbound)+
-  ggtitle(paste("Projection and bootstrap CI of total counts of cases in", daysAhead," from ", sysdate))
+  labs( title = paste(country, "- 5 days projection of total counts of cases"),
+        subtitle = paste("Bootstrapped CI at 5 days from", sysdate),
+        caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
+  )
 dev.off()
 
+predict(m, newdata = data.frame(day=1:58))
