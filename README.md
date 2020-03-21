@@ -21,3 +21,6 @@ e.g the number of new cases today divided by the number of new cases yesterday. 
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/FRmodel.png)
 
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/UKmodel.png)
+
+
