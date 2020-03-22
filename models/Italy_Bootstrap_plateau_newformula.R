@@ -97,7 +97,6 @@ SS<-getInitial(count~SSlogis(day,Asym,xmid,scale),data=data.frame(count=subs$cou
 # alpha
 # Setting the upper asyntote
 a_start<-SS["Asym"] %>%as.numeric()
-a_start<-1200000
 #K_start<-120000
 
 #beta range of growth
