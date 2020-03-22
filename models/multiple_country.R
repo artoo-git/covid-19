@@ -274,7 +274,7 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   
   guides(colour = "legend", linetype = "none")+
   
-  annotate("text", hjust =0, x=min(predictdf$absDay), y= ITinflex, vjust=-0.4,size=4, label= paste("UK is 14 days behind Italy and 6 behind France"))+
+  annotate("text", hjust =0, x=min(predictdf$absDay), y=lastCountIT, vjust=-0.4,size=4, label= paste("UK is 14 days behind Italy and 6 behind France"))+
   
   labs( title = "Cov-19: count of total cases registred by country (dots)",
         subtitle = "(log scale) dotted line shows lockdown dates",

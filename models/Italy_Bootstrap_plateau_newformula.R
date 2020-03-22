@@ -70,22 +70,73 @@ long$day<-as.numeric(long$day)
 subs<-long
 outbr_day <- min(which(subs$count >10)) # set a minimum of 20 cases to facilitate convergence
 subs<-subs[which(subs$day >= outbr_day),] 
-subs$day<-1:nrow(subs)
+#subs$day<-1:nrow(subs)
 print(paste(subs$day[1],subs$count[1],subs$country[1]))
-
 # setting outbreak day to one. Comment this to see the delay start
-outbr_day<-1 
-# estimation of start point and growth rate
-SS<-getInitial(count~SSlogis(day,alpha,xmid,scal),data=data.frame(count=subs$count,day=subs$day)) 
+outbr_day<-min(subs$day)
 
-# Setting the upper asyntote (lower asyntote is zero)
-a_start<-SS["alpha"]
-
-#logit(subs$count/a_start) # just a debug output
-phi<-coef(lm(logit(subs$count/a_start)~day,data=subs)) # another way of estimating the growth rate
 
 #logistic model - I think is the same as the Richards Logistic Growth model
-m<-nls(count~ a/(1+exp(-(b+g*day))), start=list(a=a_start,b=phi[1],g=phi[2]),data=subs)
+
+# y(t) = α/((1 + β * exp(-k * t))^(1 / m))
+#
+#   t	= time
+#   alpha = upper asymptote
+#   beta=growth range
+#   k	= growth rate
+#   m	= slope of growth
+
+
+## estimating parameters
+
+# estimation of a starting plateau level of y and midpoint
+SS<-getInitial(count~SSlogis(day,Asym,xmid,scale),data=data.frame(count=subs$count,day=subs$day)) 
+#logit(subs$count/a_start) # just a debug output
+
+
+# alpha
+# Setting the upper asyntote
+a_start<-SS["Asym"] %>%as.numeric()
+a_start<-1200000
+#K_start<-120000
+
+#beta range of growth
+b_start<-SS["Asym"]/(exp(SS["xmid"]/SS["scale"])+1) %>% as.numeric()
+
+# midpoint
+mid<-SS["xmid"] %>% as.numeric()
+# 
+#growth rate parameter
+kappa<-1/SS["scale"]
+
+#growth rate parameters <- intercept and slope (FIX ME IF I AM WRONG)
+k_r<-coef(lm(logit(subs$count/a_start)~day,data=subs))[2] %>% as.numeric()
+k_i<-coef(lm(logit(subs$count/a_start)~day,data=subs))[1] %>% as.numeric()
+
+
+
+m<-nls(count~ a/(1 + b_start*exp(-(k_i+k_r* day)))^(1/b_start), start=list(a=a_start,
+                                                 k_i=k_i,
+                                                 k_r=k_r),data=subs)
+
+
+
+
+cor(subs$count,predict(m))
+
+x<-min(subs$day):(max(subs$day)+20)
+y<-subs$count
+p<-predict(m, newdata = data.frame(day=x))
+length(y)<-length(x)
+new<-data.frame(x,y,p)
+
+cor(subs$count,predict(m))
+
+ggplot(new,aes(x,y))+
+  geom_point()+
+  geom_line(aes(x,p))
+
+predict(m, newdata = data.frame(day=31:65))
 
 ################### Bootstrap
 n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
@@ -101,7 +152,8 @@ n.Iter<-200 ### careful with the iterations, the plotting can be time consuming
 bootL<- nlsBoot(m, niter = n.Iter)
 hist(bootL$coefboot[,1], breaks = 200)
 
-x<-1:(nrow(subs)+5)
+daysAhead<-5
+x<-min(subs$day):(max(subs$day)+daysAhead)
 Param_Boo<-bootL$coefboot
 curveDF <- data.frame(matrix(0,ncol = 3,nrow =n.Iter*length(x)))
 for(i in 1:n.Iter){
@@ -116,8 +168,7 @@ for(i in 1:n.Iter){
 }
 colnames(curveDF) <- c('count','bsP','day')
 
-daysAhead<-5
-span<-1:(nrow(subs)+daysAhead)
+span<-x
 pred<-round(max(predict(m, newdata = data.frame(day=span),1)))
 lowbound<-min(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 highbound<-max(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
@@ -136,4 +187,4 @@ ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
   )
 dev.off()
 
-predict(m, newdata = data.frame(day=1:58))
+     
