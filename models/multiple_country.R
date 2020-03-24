@@ -22,7 +22,7 @@ library(gridExtra)
 ####################
           
 
-data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
+data<-read.csv(file = "https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv",header = TRUE,sep = ",")
 #data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
 
 data<-data %>% select(1:2,5:ncol(data))
@@ -229,7 +229,8 @@ yITlockdwn<-predictdf[which(predictdf$absDay==47 & predictdf$country == "Italy")
 xESlockdwn<-predictdf[which(predictdf$absDay==52 & predictdf$country == "Spain"),][4] %>% as.numeric
 yESlockdwn<-predictdf[which(predictdf$absDay==52 & predictdf$country == "Spain"),][1] %>% as.numeric
 
-#UKlockdwn
+xUKlockdwn<-predictdf[which(predictdf$absDay==61 & predictdf$country == "United Kingdom"),][4] %>% as.numeric
+yUKlockdwn<-predictdf[which(predictdf$absDay==61 & predictdf$country == "United Kingdom"),][1] %>% as.numeric
 
 
 ###################
@@ -246,7 +247,7 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
   #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),60)+
+  xlim(min(predictdf$absDay),65)+
   ####### last count labels
   annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.2,label=lastCountFR)+
   annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.2,label=lastCountUK)+
@@ -262,14 +263,21 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   
   geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=0,yend=yESlockdwn), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xESlockdwn, xend=Inf,y=yESlockdwn,yend=yESlockdwn), color = "black", linetype = 9,size = .1)+
+  
+  geom_segment(mapping=aes(x=xUKlockdwn, xend=xUKlockdwn,y=0,yend=yUKlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xUKlockdwn, xend=Inf,y=yUKlockdwn,yend=yUKlockdwn), color = "black", linetype = 9,size = .1)+
+  
   ####### lockdown counts
   annotate("text", hjust= -0.1, x=xFRlockdwn, y= yFRlockdwn, size=3, vjust=-0.4, label=yFRlockdwn) +
   annotate("text", hjust= -0.1, x=xITlockdwn, y= yITlockdwn, size=3, vjust=-0.4, label=yITlockdwn) +
   annotate("text", hjust= -0.1, x=xESlockdwn, y= yESlockdwn, size=3, vjust=-0.4, label=yESlockdwn) +
+  annotate("text", hjust= -0.1, x=xUKlockdwn, y= yUKlockdwn, size=3, vjust=-0.4, label=yUKlockdwn) +
+  
   ######lockdown labels
   annotate("text", hjust= 0, x=xITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown - 9 March") +
   annotate("text", hjust= 0, x=xESlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Spain lockdown - 14 March") +
   annotate("text", hjust= 0, x=xFRlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown - 16 March") +
+  annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown - 23 March") +
   #annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown") +
   
   guides(colour = "legend", linetype = "none")+
@@ -296,31 +304,25 @@ ydITlockdwn<-long[which(long$day==47 & long$country == "Italy"),][4] %>% as.nume
 ydESlockdwn<-long[which(long$day==52 & long$country == "Spain"),][4] %>% as.numeric
 
 png("images/daycount.png", width = 800, height = 800, units = "px")
-ggplot(data = long[which(long$day>30),], aes(x=day, y=daily, colour=country)) +
+ggplot(data = long[which(long$count>50),], aes(x=day, y=daily, colour=country)) +
   scale_y_continuous(trans = "log10")+#
-  #geom_point() +
-  #geom_line(data = long, aes(x=day, y=daily, colour = country))+
-  stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 9,raw =T), se = FALSE)+
+  geom_point() +
+  #geom_line(data = long[which(long$count>50),], aes(x=day, y=daily, colour = country))+
+  stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 3,raw =T), se = FALSE)+
   ####### lockdown segments
-  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=ydITlockdwn), color = "black", linetype = 9,size = .1)+
-  geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=ydITlockdwn,yend=ydITlockdwn), color = "black", linetype = 9,size = .1)+
-
-  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=ydFRlockdwn), color = "black", linetype = 9,size = .1)+
-  geom_segment(mapping=aes(x=xFRlockdwn, xend=Inf,y=ydFRlockdwn,yend=ydFRlockdwn), color = "black", linetype = 9,size = .1)+
-
-  geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=0,yend=ydESlockdwn), color = "black", linetype = 9,size = .1)+
-  geom_segment(mapping=aes(x=xESlockdwn, xend=Inf,y=ydESlockdwn,yend=ydESlockdwn), color = "black", linetype = 9,size = .1)+
-  ####### lockdown counts
-  annotate("text", hjust= -0.1, x=xFRlockdwn, y= ydFRlockdwn, size=3, vjust=-0.4, label=ydFRlockdwn) +
-  annotate("text", hjust= -0.1, x=xITlockdwn, y= ydITlockdwn, size=3, vjust=-0.4, label=ydITlockdwn) +
-  annotate("text", hjust= -0.1, x=xESlockdwn, y= ydESlockdwn, size=3, vjust=-0.4, label=ydESlockdwn) +
+  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xUKlockdwn, xend=xUKlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
   ######lockdown labels
   annotate("text", hjust= 0, x=xITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown - 9 March") +
   annotate("text", hjust= 0, x=xESlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Spain lockdown - 14 March") +
   annotate("text", hjust= 0, x=xFRlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown - 16 March") +
+  annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown - 23 March") +
+  
   #annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown") +
   labs( title = paste("Polynomial approx. of daily new cases as per: ", sysdate),
-        subtitle = "Per-day increase, y is Log. (polynomial degree = 9)",
+        subtitle = "Per-day increase, y is Log. (polynomial degree = 3)",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
   )
 
