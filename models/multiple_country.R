@@ -308,7 +308,7 @@ ggplot(data = long[which(long$count>50),], aes(x=day, y=daily, colour=country)) 
   scale_y_continuous(trans = "log10")+#
   geom_point() +
   #geom_line(data = long[which(long$count>50),], aes(x=day, y=daily, colour = country))+
-  stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 3,raw =T), se = FALSE)+
+  stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 9,raw =F), se = FALSE)+
   ####### lockdown segments
   geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+

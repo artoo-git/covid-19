@@ -177,7 +177,7 @@ highbound<-max(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 png("images/UKmodel.png", width = 600, height = 600, units = "px")
 ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
   xlim(1,(max(subs$day)+daysAhead+5))+
-  geom_line(color="blue") +
+  geom_line(color="green") +
   geom_vline(xintercept = max(subs$day),linetype = "dashed")+
   annotate("text", hjust = 1.05, vjust= 0, x = max(subs$day), y = max(subs$count), label = paste(max(subs$count), ". Count as per", sysdate))+
   annotate("text", hjust = 0, vjust= 0, x = max(span), y = pred, label = paste(pred))+
