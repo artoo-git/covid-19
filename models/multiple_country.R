@@ -322,8 +322,9 @@ ggplot(data = long[which(long$count>50),], aes(x=day, y=daily, colour=country)) 
   
   #annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown") +
   labs( title = paste("Polynomial approx. of daily new cases as per: ", sysdate),
-        subtitle = "Per-day increase, y is Log. (polynomial degree = 3)",
+        subtitle = "Per-day increase, y is Log.",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
   )
 
 dev.off()
+
