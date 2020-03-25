@@ -70,11 +70,11 @@ long$day<-as.numeric(long$day)
 subs<-long
 outbr_day <- min(which(subs$count >10)) # set a minimum of 20 cases to facilitate convergence
 subs<-subs[which(subs$day >= outbr_day),] 
-subs$day<-1:nrow(subs)
+#subs$day<-1:nrow(subs)
 print(paste(subs$day[1],subs$count[1],subs$country[1]))
 
 # setting outbreak day to one. Comment this to see the delay start
-outbr_day<-1 
+#outbr_day<-1 
 
 ########### selfstart paramenters for the logistic function 
 ## this model will be passed on to nlsboot
@@ -89,7 +89,7 @@ logisticModelSS <- nls(count~SSlogis(day, Asym, xmid, scal), data = subs)
 n.Iter <-5000
 SSboot<- nlsBoot(logisticModelSS, niter = n.Iter)
 
-hist(SSboot$coefboot[,3])
+hist(-1/SSboot$coefboot[,3])
 
 #growth rate parameter k is
 k_start<- (-1/SSboot$estiboot[3]) %>% as.numeric
@@ -119,8 +119,21 @@ mid<-SSboot$estiboot[2] %>% as.numeric()
 #   m	= slope of growth
 
 
-#logistic model - I think is not the same as the Richards Logistic Growth model it is missing the growth range. 
-# it is a simple enough logistic growth model and it should "do" with some more error. 
+#logistic model - I think the one below is not the same as the Richards Logistic Growth model as it is missing the growth range. 
+
+
+#  y~ a/(1 + exp(b+k * t))
+
+# where:
+#
+#   a is the upper asyntote
+#   b is the lower asyntote
+#   k is the growth rate
+#   t is the time paramenter(days)
+
+
+
+# It should be a valid and simple enough logistic growth model and it should "do" with some more error. 
 
 m<-nls(count~ a/(1 + exp(b+k * day)), start=list(
                                                 a=a_start, 
@@ -132,6 +145,20 @@ m<-nls(count~ a/(1 + exp(b+k * day)), start=list(
 #   k_startu is the boostrapped growth rate parameter k 
 #   a_start is the boostrapped upper asyntote
 #   b_start is the boostrapped lower asyntote
+
+
+summary(m)
+plot(residuals(m))
+cor(subs$count,predict(m))
+
+x<-min(subs$day):(max(subs$day+30))
+p<-predict(m, newdata = data.frame(day=min(subs$day):(max(subs$day+30))))
+y<-subs$count
+length(y)<- length(x)
+data.frame(x,y,p)%>% ggplot(aes(x,y))+
+                          geom_point()+
+                          geom_line(aes(x,p))
+
 
 
 ################### Bootstrap (the number of rows to bootstrap in this time series is ridicolously small .. )
@@ -187,4 +214,3 @@ ggplot(curveDF, aes(x=day, y=count, group=bsP)) +
   )
 dev.off()
 
-predict(m, newdata = data.frame(day=1:58))
