@@ -13,7 +13,7 @@ basic reference to non linear logistic models in R can be found at [datasciencep
 
 And here is the plot for the daily variation
 
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/dailycount.png)
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/daycount.png)
 
 
 In this logistic curve below (Projectio at 5 days), the growth factor *G* can be expressed as: 
