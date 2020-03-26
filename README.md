@@ -11,10 +11,14 @@ basic reference to non linear logistic models in R can be found at [datasciencep
 
 ## Descriptive statistics across countries. Total count and daily increase
 
+
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
 
-And here is the plot for the daily variation. *It seems* that the lockdown measures taken in Italy have started to see the first effects on the daily increase **only 12 days after their implementation by the Italian Government.**
+As I write (26 of March) the daily growth of italy has been subexpoential for a few days. This *may* indicate that Italy is approaching the inflection point. 
 
+Below is the daily variation by country (new positive tests in one day). Again, *It seems* that the lockdown measures taken in Italy have started to see the first effects on the daily increase **but only 12 days after their implementation by the Italian Government.**
+
+Looking at the changes for Italy both plots, one could speculate that the timings of the virus (incubation time, duration of disease) are so that any counter-measure taken by a goverment today will have a delayed effect of roughly two weeks (possibly less).
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/daycount.png)
 
@@ -25,7 +29,7 @@ In this logistic curve below (Projectio at 5 days), the growth factor *G* can be
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/render.png)
 
-e.g the number of new cases today divided by the number of new cases yesterday. Between 15th of March and the 21st this growth factor has been decreasing on average: This *may* indicate that Italy is approaching the inflection point. Because of the timings (incubation time, duration of disease) every measure will have a delayed effect of roughly two weeks. For comparison, the canonical exponential growth of covid is G ~ 1.3.
+e.g the number of new cases today divided by the number of new cases yesterday. When this value is greater than 1 every day we have an xponential growth.  For comparison, the value of the ration observed across countries has been around ~ 1.3. This similar growth is evident observing the similarity of the slopes plotted in the total count graph (first plot).
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/ITmodel.png)
 
