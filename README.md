@@ -9,12 +9,17 @@ These are definitely far from perfect and I would not use these for any official
 
 basic reference to non linear logistic models in R can be found at [datascienceplus](https://datascienceplus.com/first-steps-with-non-linear-regression-in-r/) and at [bscheng - modeling-logistic-growth-data](https://bscheng.com/2014/05/07/modeling-logistic-growth-data-in-r/).
 
+## Descriptive statistics across countries. Total count and daily increase
+
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
 
-And here is the plot for the daily variation
+And here is the plot for the daily variation. *It seems* that the lockdown measures taken in Italy have started to see the first effects on the daily increase **only 12 days after their implementation by the Italian Government.**
+
 
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/daycount.png)
 
+
+## Extrapolations from the logistic model
 
 In this logistic curve below (Projectio at 5 days), the growth factor *G* can be expressed as: 
 
