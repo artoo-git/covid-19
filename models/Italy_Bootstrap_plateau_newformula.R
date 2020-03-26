@@ -23,7 +23,7 @@ country = c("Italy")
 
 sysdate<-Sys.Date() %>% format(format="%B %d %Y")
 #data<-read.csv(file = "~/Windows/time_series_19-covid-Confirmed.csv",header = TRUE,sep = ",")
-link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_19-covid-Confirmed.csv"
+link<-"https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_confirmed_global.csv"
 data<-read.csv(file = link,header = TRUE,sep = ",")
 
 #data<-read.csv(file = "~/Windows/antanicov.csv",header = TRUE,sep = ",")
@@ -90,33 +90,63 @@ outbr_day<-min(subs$day)
 ## estimating parameters
 
 # estimation of a starting plateau level of y and midpoint
-SS<-getInitial(count~SSlogis(day,Asym,xmid,scale),data=data.frame(count=subs$count,day=subs$day)) 
+
+
+#SS<-getInitial(count~SSlogis(day,Asym,xmid,scal),data=data.frame(count=subs$count,day=subs$day)) 
 #logit(subs$count/a_start) # just a debug output
+
+
+
+########### selfstart nls with boostrap of start paramenters
+
+# Asym is the carrying capacity - Upper plateau
+# xmid is the x value at the inflection point of the logistic curve
+# scal is a scaling parameter for the x-axis.
+
+## same as getInitials, but I am going to feed this into bootL
+logisticModelSS <- nls(count~SSlogis(day, Asym, xmid, scal), data = subs)
+
+n.Iter <-5000
+SSboot<- nlsBoot(logisticModelSS, niter = n.Iter)
+
+hist(SSboot$coefboot[,3])
+
+#growth rate parameter k is
+k_start<- (-1/SSboot$estiboot[3]) %>% as.numeric
 
 
 # alpha
 # Setting the upper asyntote
-a_start<-SS["Asym"] %>%as.numeric()
-#K_start<-120000
+# from getInitials this is simply Asym
+a_start<-SSboot$estiboot[1] %>% as.numeric()
 
-#beta range of growth
-b_start<-SS["Asym"]/(exp(SS["xmid"]/SS["scale"])+1) %>% as.numeric()
+#b_start (lower plateau in N of cases) as per self-start can be defived from xmid = -bstart/k
+b_start<- -SSboot$estiboot[2]*k_start
 
-# midpoint
-mid<-SS["xmid"] %>% as.numeric()
+# midpoint in numner of days
+mid<-SSboot$estiboot[2] %>% as.numeric()
 # 
-#growth rate parameter
-kappa<-1/SS["scale"]
 
-#growth rate parameters <- intercept and slope (FIX ME IF I AM WRONG)
-k_r<-coef(lm(logit(subs$count/a_start)~day,data=subs))[2] %>% as.numeric()
-k_i<-coef(lm(logit(subs$count/a_start)~day,data=subs))[1] %>% as.numeric()
+m<-nls(count~ a/(1 + exp(b+k * day)), start=list(
+                                                a=a_start, 
+                                                k=k_start,
+                                                b=b_start
+                                                ),data=subs)
 
 
+# y(t) = α/((1 + β * exp(-k * t))^(1 / m))
+#
+#   t	= time
+#   alpha = upper asymptote
+#   beta=growth range
+#   k	= growth rate
+#   m	= slope of growth
 
-m<-nls(count~ a/(1 + b_start*exp(-(k_i+k_r* day)))^(1/b_start), start=list(a=a_start,
-                                                 k_i=k_i,
-                                                 k_r=k_r),data=subs)
+m<-nls(count~ alpha/((1+beta*exp(-k*day))^/(1/m), start=list(
+                                                 a=a_start,
+                                                 b=b_start,
+                                                 k=k_start
+                                                 ),data=subs)
 
 
 
@@ -129,13 +159,12 @@ p<-predict(m, newdata = data.frame(day=x))
 length(y)<-length(x)
 new<-data.frame(x,y,p)
 
-cor(subs$count,predict(m))
 
 ggplot(new,aes(x,y))+
   geom_point()+
   geom_line(aes(x,p))
 
-predict(m, newdata = data.frame(day=31:65))
+predict(m, newdata = data.frame(day=31:90))
 
 ################### Bootstrap
 n.Iter<-5000 ### careful with the iterations, the plotting can be time consuming
