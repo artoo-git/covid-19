@@ -17,7 +17,7 @@ library(gridExtra)
 
 #####################
 
-          country = c("Italy","France","United Kingdom","Spain","Germany")
+          country = c("Italy","France","United Kingdom","Spain","Germany","Korea, South")
 
 ####################
           
@@ -151,7 +151,7 @@ long$day<-as.numeric(long$day)
    days<-((outbr_day):nrow(subs)) # number of day for plot and extrapolation
    
    #   
-#   predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
+   predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
 #   cc<-rep(c, each = limit) # create the factor "country" column
     cc<-rep(c, each = nrow(subs))
 #   
@@ -242,7 +242,7 @@ png("images/Rplot06.png", width = 800, height = 800, units = "px")
 ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
   #geom_line(size = 1)+
-  stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x, 6))+
+  stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x,7))+
   
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
@@ -288,6 +288,61 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
         subtitle = "(log scale) dotted line shows lockdown dates",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
         )
+
+
+dev.off()
+
+## same total days but not log plot
+
+png("images/Rplot05.png", width = 800, height = 800, units = "px")
+
+ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
+  geom_point() +
+  stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x, 7))+
+  #scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
+  #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
+  xlim(min(predictdf$absDay),65)+
+  ####### last count labels
+  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.2,label=lastCountFR)+
+  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.2,label=lastCountUK)+
+  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.2,label=lastCountIT)+
+  annotate("text", hjust =0, x=dayES, y= lastCountES, size=4, vjust=-0.2,label=lastCountES)+
+  annotate("text", hjust =0, x=dayES, y= lastCountDE, size=4, vjust=-0.2,label=lastCountDE)+
+  ####### lockdown segments
+  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
+  
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=yFRlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=Inf,y=yFRlockdwn,yend=yFRlockdwn), color = "black", linetype = 9,size = .1)+
+  
+  geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=0,yend=yESlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xESlockdwn, xend=Inf,y=yESlockdwn,yend=yESlockdwn), color = "black", linetype = 9,size = .1)+
+  
+  geom_segment(mapping=aes(x=xUKlockdwn, xend=xUKlockdwn,y=0,yend=yUKlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xUKlockdwn, xend=Inf,y=yUKlockdwn,yend=yUKlockdwn), color = "black", linetype = 9,size = .1)+
+  
+  ####### lockdown counts
+  annotate("text", hjust= -0.1, x=xFRlockdwn, y= yFRlockdwn, size=3, vjust=-0.4, label=yFRlockdwn) +
+  annotate("text", hjust= -0.1, x=xITlockdwn, y= yITlockdwn, size=3, vjust=-0.4, label=yITlockdwn) +
+  annotate("text", hjust= -0.1, x=xESlockdwn, y= yESlockdwn, size=3, vjust=-0.4, label=yESlockdwn) +
+  annotate("text", hjust= -0.1, x=xUKlockdwn, y= yUKlockdwn, size=3, vjust=-0.4, label=yUKlockdwn) +
+  
+  ######lockdown labels
+  annotate("text", hjust= 0, x=xITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown - 9 March") +
+  annotate("text", hjust= 0, x=xESlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Spain lockdown - 14 March") +
+  annotate("text", hjust= 0, x=xFRlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown - 16 March") +
+  annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown - 23 March") +
+  #annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown") +
+  
+  guides(colour = "legend", linetype = "none")+
+  
+  annotate("text", hjust =0, x=min(predictdf$absDay), y=lastCountIT, vjust=-0.4,size=4, label= paste("UK is 14 days behind Italy and 6 behind France"))+
+  
+  labs( title = "Cov-19: count of total cases registred by country (dots)",
+        subtitle = "(Linear scale) dotted line shows lockdown dates",
+        caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
+  )
 
 
 dev.off()
