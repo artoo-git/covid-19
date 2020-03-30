@@ -244,7 +244,7 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   #geom_line(size = 1)+
   stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x,7))+
   
-  scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
+  scale_y_continuous(trans = "log10", labels=scales::comma)+ # scales::comma allows for no exp abbr. in y labels
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
   #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
   xlim(min(predictdf$absDay),(max(predictdf$absDay)+5))+
@@ -356,7 +356,7 @@ ydESlockdwn<-long[which(long$day==52 & long$country == "Spain"),][4] %>% as.nume
 
 png("images/daycount.png", width = 800, height = 800, units = "px")
 ggplot(data = long[which(long$count>50),], aes(x=day, y=daily, colour=country)) +
-  scale_y_continuous(trans = "log10")+#
+  scale_y_continuous(trans = "log10",labels=scales::comma)+ # scales::comma allows for no exp abbr. in y labels
   geom_point() +
   #geom_line(data = long[which(long$count>50),], aes(x=day, y=daily, colour = country))+
   stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 4,raw =F), se = T, alpha = .1)+
