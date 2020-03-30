@@ -247,13 +247,13 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
   #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),65)+
+  xlim(min(predictdf$absDay),(max(predictdf$absDay)+5))+
   ####### last count labels
-  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.2,label=lastCountFR)+
-  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.2,label=lastCountUK)+
-  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.2,label=lastCountIT)+
-  annotate("text", hjust =0, x=dayES, y= lastCountES, size=4, vjust=-0.2,label=lastCountES)+
-  annotate("text", hjust =0, x=dayES, y= lastCountDE, size=4, vjust=-0.2,label=lastCountDE)+
+  annotate("text", hjust =-0.15, x=dayFR, y= lastCountFR, size=3, vjust=0,label=lastCountFR)+
+  annotate("text", hjust =-0.15, x=dayUK, y= lastCountUK, size=3, vjust=0,label=lastCountUK)+
+  annotate("text", hjust =-0.15, x=dayIT, y= lastCountIT, size=3, vjust=0,label=lastCountIT)+
+  annotate("text", hjust =-0.15, x=dayES, y= lastCountES, size=3, vjust=0,label=lastCountES)+
+  annotate("text", hjust =-0.15, x=dayES, y= lastCountDE, size=3, vjust=0,label=lastCountDE)+
   ####### lockdown segments
   geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
@@ -302,25 +302,21 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   #scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
   scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
   #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),65)+
+  xlim(min(predictdf$absDay),(max(predictdf$absDay)+5))+
   ####### last count labels
-  annotate("text", hjust =0, x=dayFR, y= lastCountFR, size=4, vjust=-0.2,label=lastCountFR)+
-  annotate("text", hjust =0, x=dayUK, y= lastCountUK, size=4, vjust=-0.2,label=lastCountUK)+
-  annotate("text", hjust =0, x=dayIT, y= lastCountIT, size=4, vjust=-0.2,label=lastCountIT)+
-  annotate("text", hjust =0, x=dayES, y= lastCountES, size=4, vjust=-0.2,label=lastCountES)+
-  annotate("text", hjust =0, x=dayES, y= lastCountDE, size=4, vjust=-0.2,label=lastCountDE)+
+  annotate("text", hjust =-0.15, x=dayFR, y= lastCountFR, size=3, vjust=0,label=lastCountFR)+
+  annotate("text", hjust =-0.15, x=dayUK, y= lastCountUK, size=3, vjust=0,label=lastCountUK)+
+  annotate("text", hjust =-0.15, x=dayIT, y= lastCountIT, size=3, vjust=0,label=lastCountIT)+
+  annotate("text", hjust =-0.15, x=dayES, y= lastCountES, size=3, vjust=0,label=lastCountES)+
+  annotate("text", hjust =-0.15, x=dayES, y= lastCountDE, size=3, vjust=0,label=lastCountDE)+
   ####### lockdown segments
-  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
-  geom_segment(mapping=aes(x=xITlockdwn, xend=Inf,y=yITlockdwn,yend=yITlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=yITlockdwn,yend=Inf), color = "black", linetype = 9,size = .1)+
   
-  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=yFRlockdwn), color = "black", linetype = 9,size = .1)+
-  geom_segment(mapping=aes(x=xFRlockdwn, xend=Inf,y=yFRlockdwn,yend=yFRlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=yFRlockdwn,yend=Inf), color = "black", linetype = 9,size = .1)+
   
-  geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=0,yend=yESlockdwn), color = "black", linetype = 9,size = .1)+
-  geom_segment(mapping=aes(x=xESlockdwn, xend=Inf,y=yESlockdwn,yend=yESlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=yESlockdwn,yend=Inf), color = "black", linetype = 9,size = .1)+
   
-  geom_segment(mapping=aes(x=xUKlockdwn, xend=xUKlockdwn,y=0,yend=yUKlockdwn), color = "black", linetype = 9,size = .1)+
-  geom_segment(mapping=aes(x=xUKlockdwn, xend=Inf,y=yUKlockdwn,yend=yUKlockdwn), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xUKlockdwn, xend=xUKlockdwn,y=yUKlockdwn,yend=Inf), color = "black", linetype = 9,size = .1)+
   
   ####### lockdown counts
   annotate("text", hjust= -0.1, x=xFRlockdwn, y= yFRlockdwn, size=3, vjust=-0.4, label=yFRlockdwn) +
@@ -329,10 +325,10 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   annotate("text", hjust= -0.1, x=xUKlockdwn, y= yUKlockdwn, size=3, vjust=-0.4, label=yUKlockdwn) +
   
   ######lockdown labels
-  annotate("text", hjust= 0, x=xITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown - 9 March") +
-  annotate("text", hjust= 0, x=xESlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Spain lockdown - 14 March") +
-  annotate("text", hjust= 0, x=xFRlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="France lockdown - 16 March") +
-  annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown - 23 March") +
+  annotate("text", hjust= 1.1, x=xITlockdwn, y= max(predictdf$count), size=4, angle=90, vjust=-0.2, label="Italy lockdown - 9 March") +
+  annotate("text", hjust= 1.1, x=xESlockdwn, y= max(predictdf$count), size=4, angle=90, vjust=-0.2, label="Spain lockdown - 14 March") +
+  annotate("text", hjust= 1.1, x=xFRlockdwn, y= max(predictdf$count), size=4, angle=90, vjust=-0.2, label="France lockdown - 16 March") +
+  annotate("text", hjust= 1.1, x=xUKlockdwn, y= max(predictdf$count), size=4, angle=90, vjust=-0.2, label="UK lockdown - 23 March") +
   #annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown") +
   
   guides(colour = "legend", linetype = "none")+
