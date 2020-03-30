@@ -120,7 +120,7 @@ long$day<-as.numeric(long$day)
  for (c in country){ # loops around the country selected, runs nls(), and builds the predictdf dataframe
 #   
    subs<-long[which(long$country == c),]
-   outbr_day <- min(which(subs$count >16)) # set a minimum of 20 cases to facilitate convergence
+   outbr_day <- min(which(subs$count >50)) # set a minimum of 20 cases to facilitate convergence
    subs<-subs[which(subs$day >= outbr_day),] 
    subs$absDay<-subs$day
    subs$day<-1:nrow(subs)
@@ -151,7 +151,7 @@ long$day<-as.numeric(long$day)
    days<-((outbr_day):nrow(subs)) # number of day for plot and extrapolation
    
    #   
-   predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
+   #predict<-predict(m, newdata =  data.frame(day = days)) #  extrapolation
 #   cc<-rep(c, each = limit) # create the factor "country" column
     cc<-rep(c, each = nrow(subs))
 #   
@@ -363,7 +363,7 @@ ggplot(data = long[which(long$count>50),], aes(x=day, y=daily, colour=country)) 
   scale_y_continuous(trans = "log10")+#
   geom_point() +
   #geom_line(data = long[which(long$count>50),], aes(x=day, y=daily, colour = country))+
-  stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 7,raw =F), se = FALSE)+
+  stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 4,raw =F), se = T, alpha = .1)+
   ####### lockdown segments
   geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+

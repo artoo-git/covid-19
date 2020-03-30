@@ -89,7 +89,7 @@ logisticModelSS <- nls(count~SSlogis(day, Asym, xmid, scal), data = subs)
 n.Iter <-5000
 SSboot<- nlsBoot(logisticModelSS, niter = n.Iter)
 
-hist(-1/SSboot$coefboot[,3])
+hist(SSboot$coefboot[,2])
 
 #growth rate parameter k is
 k_start<- (-1/SSboot$estiboot[3]) %>% as.numeric
@@ -177,9 +177,10 @@ bootL<- nlsBoot(m, niter = n.Iter)
 hist(bootL$coefboot[,1], breaks = 200)
 
 #set days ahead for the prediciton
-daysAhead<-10
+daysAhead<-5
+span<-min(subs$day):(max(subs$day)+daysAhead)
 
-x<-1:(nrow(subs)+daysAhead)
+x<-span
 Param_Boo<-bootL$coefboot
 curveDF <- data.frame(matrix(0,ncol = 3,nrow =n.Iter*length(x)))
 for(i in 1:n.Iter){
@@ -194,8 +195,8 @@ for(i in 1:n.Iter){
 }
 colnames(curveDF) <- c('count','bsP','day')
 
-span<-1:(nrow(subs)+daysAhead)
-pred<-round(max(predict(m, newdata = data.frame(day=span),1)))
+
+pred<-round(max(predict(m, newdata = data.frame(day=span)),1))
 lowbound<-min(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 highbound<-max(curveDF[which(curveDF$day == max(span)),][1]) %>% round(0)
 
