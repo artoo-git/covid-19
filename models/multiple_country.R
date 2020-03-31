@@ -247,7 +247,7 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   scale_y_continuous(trans = "log10", labels=scales::comma)+ # scales::comma allows for no exp abbr. in y labels
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
   #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),(max(predictdf$absDay)+5))+
+  xlim(min(predictdf$absDay),(max(predictdf$absDay)+3))+
   ####### last count labels
   annotate("text", hjust =-0.15, x=dayFR, y= lastCountFR, size=3, vjust=0,label=lastCountFR)+
   annotate("text", hjust =-0.15, x=dayUK, y= lastCountUK, size=3, vjust=0,label=lastCountUK)+
@@ -359,7 +359,8 @@ ggplot(data = long[which(long$count>50),], aes(x=day, y=daily, colour=country)) 
   scale_y_continuous(trans = "log10",labels=scales::comma)+ # scales::comma allows for no exp abbr. in y labels
   geom_point() +
   #geom_line(data = long[which(long$count>50),], aes(x=day, y=daily, colour = country))+
-  stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x, 4,raw =F), se = T, alpha = .1)+
+  #stat_smooth(aes(x=day, y=daily, colour = country), method = lm, formula = y ~ poly(x,4,raw =F), se = T, alpha = .1)+
+  stat_smooth(aes(x=day, y=daily, colour = country), method = "gam", formula = y~s(x), se = T, alpha = .1)+
   ####### lockdown segments
   geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
@@ -372,7 +373,7 @@ ggplot(data = long[which(long$count>50),], aes(x=day, y=daily, colour=country)) 
   annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown - 23 March") +
   
   #annotate("text", hjust= 0, x=xUKlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="UK lockdown") +
-  labs( title = paste("Polynomial approx. of daily new cases as per: ", sysdate),
+  labs( title = paste("GAM approx. of daily new cases as per: ", sysdate),
         subtitle = "Per-day increase, y is Log.",
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
   )
