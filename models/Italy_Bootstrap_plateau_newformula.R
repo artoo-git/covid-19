@@ -109,7 +109,7 @@ logisticModelSS <- nls(count~SSlogis(day, Asym, xmid, scal), data = subs)
 n.Iter <-5000
 SSboot<- nlsBoot(logisticModelSS, niter = n.Iter)
 
-hist(SSboot$coefboot[,3])
+hist(-1/SSboot$coefboot[,3])
 
 #growth rate parameter k is
 k_start<- (-1/SSboot$estiboot[3]) %>% as.numeric
@@ -142,7 +142,7 @@ m<-nls(count~ a/(1 + exp(b+k * day)), start=list(
 #   k	= growth rate
 #   m	= slope of growth
 
-m<-nls(count~ alpha/((1+beta*exp(-k*day))^/(1/m), start=list(
+m<-nls(count~ alpha/((1+beta*exp(-k*day))^/(1/m)), start=list(
                                                  a=a_start,
                                                  b=b_start,
                                                  k=k_start

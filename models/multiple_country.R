@@ -242,8 +242,7 @@ png("images/Rplot06.png", width = 800, height = 800, units = "px")
 ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
   #geom_line(size = 1)+
-  stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x,7))+
-  
+  stat_smooth(aes(x=absDay, y=count, colour = country), method = "gam", formula = y~s(x), level = 0)+
   scale_y_continuous(trans = "log10", labels=scales::comma)+ # scales::comma allows for no exp abbr. in y labels
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
   #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
