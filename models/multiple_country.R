@@ -242,11 +242,12 @@ png("images/Rplot06.png", width = 800, height = 800, units = "px")
 ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
   #geom_line(size = 1)+
+  xlim(min(predictdf$absDay),(max(predictdf$absDay)+3))+
   stat_smooth(aes(x=absDay, y=count, colour = country), method = "gam", formula = y~s(x), level = 0)+
   scale_y_continuous(trans = "log10", labels=scales::comma)+ # scales::comma allows for no exp abbr. in y labels
   #scale_y_continuous(breaks = round(seq(0, max(predictdf$count), len = 10),1))+ # breaks for linear y scale
   #scale_x_continuous(breaks = seq(0, max(predictdf$day), by = 5))+
-  xlim(min(predictdf$absDay),(max(predictdf$absDay)+3))+
+  
   ####### last count labels
   annotate("text", hjust =-0.15, x=dayFR, y= lastCountFR, size=3, vjust=0,label=lastCountFR)+
   annotate("text", hjust =-0.15, x=dayUK, y= lastCountUK, size=3, vjust=0,label=lastCountUK)+
