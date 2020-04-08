@@ -237,9 +237,9 @@ yUKlockdwn<-predictdf[which(predictdf$absDay==61 & predictdf$country == "United 
 
 
 
-png("images/Rplot06.png", width = 800, height = 800, units = "px")
+png("images/Rplot6.png", width = 800, height = 800, units = "px")
 
-ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
+plot1<-ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
   #geom_line(size = 1)+
   xlim(min(predictdf$absDay),(max(predictdf$absDay)+3))+
@@ -289,14 +289,14 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
         )
 
-
+plot1
 dev.off()
 
 ## same total days but not log plot
 
 png("images/Rplot05.png", width = 800, height = 800, units = "px")
 
-ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
+plot2<-ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
   stat_smooth(aes(x=absDay, y=count, colour = country), method = lm , level = 0,formula = y ~ poly(x, 7))+
   #scale_y_continuous(trans = "log10")+#, breaks = round(seq(0, max(predictdf$predict), len = 10),1))+ # breaks for linear y scale
@@ -340,8 +340,18 @@ ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
         caption = paste("Updated ", sysdate, ". Data source: Johns Hopkins public dataset")
   )
 
-
+plot2
 dev.off()
+
+#### COMBINED PLOTS
+
+#png("images/Rplot2.png", width = 1500, height = 800, units = "px")
+#require(gridExtra)
+
+#grid.arrange(plot1, plot2, ncol=2)
+
+#dev.off()
+
 
 
 
