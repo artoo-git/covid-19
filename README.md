@@ -12,26 +12,25 @@ basic reference to non linear logistic models in R can be found at [datasciencep
 ## Descriptive statistics across countries. Total count and daily increase
 
 
-
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)
-
-
-
-As I write (26 of March) the daily growth of italy has been subexpoential for a few days. This *may* indicate that Italy is approaching the inflection point. 
-
-Below is the daily variation by country (new positive tests in one day). Again, *It seems* that the lockdown measures taken in Italy have started to see the first effects on the daily increase **but only 12 days after their implementation by the Italian Government.**
-
-Looking at the changes for Italy (both plots), one could speculate that the timings of the virus (incubation time, duration of disease) are so that any counter-measure taken by a goverment today will have a delayed effect of roughly two weeks (possibly less).
+Detected cases by country  |  Death-count by coutry
+:-------------------------:|:-------------------------:
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)  | ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06_D.png)
 
 
 
 
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/daycount.png)
+
+Looking at the changes in the rate for death and new cases (both plots), one could speculate that the timings of the virus (incubation time, duration of disease) are so that any counter-measure taken by a goverment today will have a delayed effect of roughly two weeks (possibly less).
+
+
+
+Daily detected cases by country  |  Daily death-count by coutry
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/daycount.png) | ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/daycount_D.png)
 
 
 ## Extrapolations from the logistic model 
 
-[being reworked in a SIRD model] work in progress - contribute i you like
+[being reworked in a SIRD model] work in progress - contribute if you like
 
 
 
