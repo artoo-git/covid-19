@@ -319,7 +319,7 @@ ggplot(data = long[which(long$count>50),], aes(x=day, y=daily, colour=country)) 
   geom_segment(mapping=aes(x=xITlockdwn, xend=xITlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xFRlockdwn, xend=xFRlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xESlockdwn, xend=xESlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
-  geom_segment(mapping=aes(x=xESlockdwn, xend=xESrelax,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
+  geom_segment(mapping=aes(x=xESrelax, xend=xESrelax,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
   geom_segment(mapping=aes(x=xUKlockdwn, xend=xUKlockdwn,y=0,yend=Inf), color = "black", linetype = 9,size = .1)+
   ######lockdown labels
   annotate("text", hjust= 0, x=xITlockdwn, y= 0, size=4, angle=90, vjust=-0.4, label="Italy lockdown - 9 March") +
