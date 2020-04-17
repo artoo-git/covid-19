@@ -14,7 +14,7 @@ basic reference to non linear logistic models in R can be found at [datasciencep
 
 Detected cases by country  |  Death-count by coutry
 :-------------------------:|:-------------------------:
-![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06.png)  | ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot06_D.png)
+![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot6.png)  | ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/Rplot6_D.png)
 
 
 
@@ -25,6 +25,7 @@ Looking at the changes in the rate for death and new cases (both plots), one cou
 
 
 Daily detected cases by country  |  Daily death-count by coutry
+:-------------------------------:|:----------------------------------:
 ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/daycount.png) | ![alt text](https://github.com/artoo-git/covid-19/blob/master/images/daycount_D.png)
 
 
