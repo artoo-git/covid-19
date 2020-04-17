@@ -294,7 +294,7 @@ dev.off()
 
 ## same total days but not log plot
 
-png("images/Rplot05.png", width = 800, height = 800, units = "px")
+png("images/Rplot5.png", width = 800, height = 800, units = "px")
 
 plot2<-ggplot(data = predictdf, aes(x=absDay, y=count, colour=country, breaks = 10)) +
   geom_point() +
